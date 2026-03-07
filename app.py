@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 import sqlite3
 import threading
 import time
@@ -19,10 +18,7 @@ BASE_DIR = Path(__file__).resolve().parent
 DB_PATH = BASE_DIR / "scheduler.db"
 
 app = Flask(__name__)
-app.secret_key = os.getenv("SECRET_KEY", "dev-change-me")
-app.config["SESSION_COOKIE_HTTPONLY"] = True
-app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
-app.config["SESSION_COOKIE_SECURE"] = os.getenv("SESSION_COOKIE_SECURE", "false").lower() == "true"
+app.secret_key = "dev-change-me"
 
 
 @dataclass
@@ -38,9 +34,12 @@ PROVIDERS = {
         smtp_port=587,
         guide_url="https://support.google.com/accounts/answer/185833",
     ),
+    "outlook": ProviderConfig(
+        smtp_server="smtp.office365.com",
+        smtp_port=587,
+        guide_url="https://support.microsoft.com/en-us/account-billing/how-to-get-and-use-app-passwords-5896ed9b-4263-e681-128a-a6f2979a7944",
+    ),
 }
-
-_scheduler_started = False
 
 
 def get_db() -> sqlite3.Connection:
@@ -69,19 +68,6 @@ def init_db() -> None:
             """
         )
         conn.commit()
-
-
-def fetch_recent_jobs(limit: int = 15) -> list[sqlite3.Row]:
-    with closing(get_db()) as conn:
-        return conn.execute(
-            """
-            SELECT id, provider, sender_email, recipient_email, subject, send_at_utc, status, error_message
-            FROM scheduled_emails
-            ORDER BY datetime(send_at_utc) DESC
-            LIMIT ?
-            """,
-            (limit,),
-        ).fetchall()
 
 
 def send_email(provider: str, sender_email: str, sender_password: str, recipient_email: str, subject: str, body: str) -> None:
@@ -141,41 +127,19 @@ def scheduler_loop() -> None:
         time.sleep(30)
 
 
-def start_background_services() -> None:
-    global _scheduler_started
-    if _scheduler_started:
-        return
-
-    init_db()
-    if os.getenv("RUN_SCHEDULER", "true").lower() == "true":
-        thread = threading.Thread(target=scheduler_loop, daemon=True)
-        thread.start()
-    _scheduler_started = True
-
-
-@app.before_request
-def ensure_services_started() -> None:
-    start_background_services()
-
-
-@app.route("/healthz", methods=["GET"])
-def healthz():
-    return {"status": "ok"}, 200
-
 @app.route("/", methods=["GET"])
 def index():
-    return redirect(url_for("connect_page"))
+    with closing(get_db()) as conn:
+        jobs = conn.execute(
+            """
+            SELECT id, provider, sender_email, recipient_email, subject, send_at_utc, status, error_message
+            FROM scheduled_emails
+            ORDER BY datetime(send_at_utc) DESC
+            LIMIT 15
+            """
+        ).fetchall()
 
-
-@app.route("/connect", methods=["GET"])
-def connect_page():
-    connection = session.get("connection")
-    return render_template(
-        "connect.html",
-        providers=PROVIDERS,
-        current_step="connect",
-        connection=connection,
-    )
+    return render_template("index.html", providers=PROVIDERS, jobs=jobs)
 
 
 @app.route("/connect", methods=["POST"])
@@ -184,27 +148,17 @@ def connect_account():
     sender_email = request.form.get("sender_email", "").strip()
     sender_password = request.form.get("sender_password", "").strip()
 
-    if provider != "gmail" or not sender_email or not sender_password:
-        flash("Please use Gmail and provide sender email + app password.", "error")
-        return redirect(url_for("connect_page"))
+    if provider not in PROVIDERS or not sender_email or not sender_password:
+        flash("Please choose Gmail/Outlook and provide sender email + app password.", "error")
+        return redirect(url_for("index"))
 
     session["connection"] = {
         "provider": provider,
         "sender_email": sender_email,
         "sender_password": sender_password,
     }
-    flash("Connected Gmail account for scheduling.", "success")
-    return redirect(url_for("generate_page"))
-
-
-@app.route("/generate", methods=["GET"])
-def generate_page():
-    return render_template(
-        "generate.html",
-        current_step="generate",
-        generated_subject=session.get("generated_subject", ""),
-        generated_body=session.get("generated_body", ""),
-    )
+    flash(f"Connected {provider.title()} account for scheduling.", "success")
+    return redirect(url_for("index"))
 
 
 @app.route("/generate", methods=["POST"])
@@ -223,20 +177,22 @@ def generate():
         tone=tone,
     )
 
-    session["generated_subject"] = subject
-    session["generated_body"] = body
-    flash("Draft generated. Review and schedule it on the next page.", "success")
-    return redirect(url_for("schedule_page"))
+    with closing(get_db()) as conn:
+        jobs = conn.execute(
+            """
+            SELECT id, provider, sender_email, recipient_email, subject, send_at_utc, status, error_message
+            FROM scheduled_emails
+            ORDER BY datetime(send_at_utc) DESC
+            LIMIT 15
+            """
+        ).fetchall()
 
-
-@app.route("/schedule", methods=["GET"])
-def schedule_page():
     return render_template(
-        "schedule.html",
-        current_step="schedule",
-        generated_subject=session.get("generated_subject", ""),
-        generated_body=session.get("generated_body", ""),
-        jobs=fetch_recent_jobs(),
+        "index.html",
+        providers=PROVIDERS,
+        generated_subject=subject,
+        generated_body=body,
+        jobs=jobs,
     )
 
 
@@ -244,8 +200,8 @@ def schedule_page():
 def schedule():
     connection = session.get("connection")
     if not connection:
-        flash("Connect Gmail first.", "error")
-        return redirect(url_for("connect_page"))
+        flash("Connect Gmail or Outlook first.", "error")
+        return redirect(url_for("index"))
 
     recipient_email = request.form.get("recipient_email", "").strip()
     subject = request.form.get("subject", "").strip()
@@ -254,14 +210,14 @@ def schedule():
 
     if not recipient_email or not subject or not body or not send_at_local:
         flash("Fill recipient, subject, body, and schedule time.", "error")
-        return redirect(url_for("schedule_page"))
+        return redirect(url_for("index"))
 
     try:
         send_at = datetime.fromisoformat(send_at_local)
         send_at_utc = send_at.astimezone(timezone.utc)
     except ValueError:
         flash("Invalid schedule date/time.", "error")
-        return redirect(url_for("schedule_page"))
+        return redirect(url_for("index"))
 
     with closing(get_db()) as conn:
         conn.execute(
@@ -285,15 +241,11 @@ def schedule():
         conn.commit()
 
     flash("Email scheduled successfully.", "success")
-    return redirect(url_for("schedule_page"))
-
-
-start_background_services()
+    return redirect(url_for("index"))
 
 
 if __name__ == "__main__":
-    app.run(
-        debug=os.getenv("FLASK_DEBUG", "false").lower() == "true",
-        host="0.0.0.0",
-        port=int(os.getenv("PORT", "5000")),
-    )
+    init_db()
+    thread = threading.Thread(target=scheduler_loop, daemon=True)
+    thread.start()
+    app.run(debug=True, host="0.0.0.0", port=5000)
