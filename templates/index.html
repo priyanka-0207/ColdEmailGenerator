@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cold Email Generator + Scheduler</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body>
+  <main class="container">
+    <h1>Cold Email Generator + Free Scheduler</h1>
+    <p class="muted">Generate from your resume context, then send later with Gmail or Outlook app passwords.</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <section>
+        {% for category, message in messages %}
+          <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      </section>
+      {% endif %}
+    {% endwith %}
+
+    <section class="card">
+      <h2>1) Connect Gmail or Outlook (free)</h2>
+      <form method="post" action="{{ url_for('connect_account') }}" class="grid">
+        <label>Provider
+          <select name="provider" required>
+            <option value="gmail">Gmail</option>
+            <option value="outlook">Outlook</option>
+          </select>
+        </label>
+        <label>Sender email
+          <input type="email" name="sender_email" required placeholder="you@example.com" />
+        </label>
+        <label>App password
+          <input type="password" name="sender_password" required placeholder="App password" />
+        </label>
+        <button type="submit">Connect</button>
+      </form>
+      <ul>
+        {% for key, config in providers.items() %}
+          <li><strong>{{ key.title() }}</strong> app password guide: <a href="{{ config.guide_url }}" target="_blank" rel="noreferrer">{{ config.guide_url }}</a></li>
+        {% endfor %}
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>2) Generate cold email</h2>
+      <form method="post" action="{{ url_for('generate') }}" class="grid">
+        <label>Resume context (bullet points work best)
+          <textarea name="resume_context" rows="6" placeholder="Led outbound campaigns, improved conversion 40%..." required></textarea>
+        </label>
+        <label>Target company
+          <input name="target_company" placeholder="Acme Inc" />
+        </label>
+        <label>Target role
+          <input name="target_role" placeholder="Sales Development Representative" />
+        </label>
+        <label>Recipient first name
+          <input name="recipient_name" placeholder="Taylor" />
+        </label>
+        <label>Tone
+          <select name="tone">
+            <option value="friendly">Friendly</option>
+            <option value="confident">Confident</option>
+            <option value="direct">Direct</option>
+          </select>
+        </label>
+        <button type="submit">Generate</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>3) Schedule send</h2>
+      <form method="post" action="{{ url_for('schedule') }}" class="grid">
+        <label>Recipient email
+          <input type="email" name="recipient_email" required placeholder="recruiter@company.com" />
+        </label>
+        <label>Subject
+          <input name="subject" required value="{{ generated_subject or '' }}" />
+        </label>
+        <label>Email body
+          <textarea name="body" rows="10" required>{{ generated_body or '' }}</textarea>
+        </label>
+        <label>Send at (your local time)
+          <input type="datetime-local" name="send_at" required />
+        </label>
+        <button type="submit">Schedule email</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>Recent scheduled emails</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Provider</th>
+              <th>From</th>
+              <th>To</th>
+              <th>Subject</th>
+              <th>Send UTC</th>
+              <th>Status</th>
+              <th>Error</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for job in jobs %}
+            <tr>
+              <td>{{ job.id }}</td>
+              <td>{{ job.provider }}</td>
+              <td>{{ job.sender_email }}</td>
+              <td>{{ job.recipient_email }}</td>
+              <td>{{ job.subject }}</td>
+              <td>{{ job.send_at_utc }}</td>
+              <td>{{ job.status }}</td>
+              <td>{{ job.error_message or '-' }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="8">No scheduled emails yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
