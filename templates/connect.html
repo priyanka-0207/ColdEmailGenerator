@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Connect Inbox · Cold Email Studio{% endblock %}
+{% block content %}
+<section class="card single">
+  <div class="card-head">
+    <h2>Step 1: Connect your Gmail or Outlook account</h2>
+    <p>Use an app password so you can send for free via SMTP.</p>
+  </div>
+
+  <form method="post" action="{{ url_for('connect_account') }}" class="form-grid">
+    <label>Provider
+      <select name="provider" required>
+        <option value="gmail">Gmail</option>
+        <option value="outlook">Outlook</option>
+      </select>
+    </label>
+    <label>Sender email
+      <input type="email" name="sender_email" required placeholder="you@example.com" value="{{ connection.sender_email if connection else '' }}" />
+    </label>
+    <label>App password
+      <input type="password" name="sender_password" required placeholder="App password" />
+    </label>
+    <button type="submit">Connect and continue</button>
+  </form>
+
+  {% if connection %}
+    <div class="info-box">
+      Connected: <strong>{{ connection.provider.title() }}</strong> ({{ connection.sender_email }})
+    </div>
+  {% endif %}
+
+  <div class="provider-links">
+    {% for key, config in providers.items() %}
+      <a href="{{ config.guide_url }}" target="_blank" rel="noreferrer">{{ key.title() }} app password guide →</a>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}
