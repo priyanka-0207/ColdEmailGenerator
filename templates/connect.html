@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Page 1 · Connect Gmail / Outlook{% endblock %}
+{% block content %}
+<section class="card single">
+  <div class="card-head">
+    <p class="card-kicker">Step 1</p>
+    <h2>Connect Gmail or Outlook</h2>
+    <p>Connect your sender account using SMTP app password.</p>
+  </div>
+
+  <form method="post" action="{{ url_for('connect_account') }}" class="form-grid">
+    <label>Provider
+      <select name="provider" required>
+        <option value="gmail">Gmail</option>
+        <option value="outlook">Outlook</option>
+      </select>
+    </label>
+    <label>Email address
+      <input type="email" name="sender_email" required placeholder="you@example.com" value="{{ connection.sender_email if connection else '' }}" />
+    </label>
+    <label>App password
+      <input type="password" name="sender_password" required placeholder="App password" />
+    </label>
+    <button type="submit">Connect account</button>
+  </form>
+
+  {% if connection %}
+    <div class="info-box">
+      Connected: <strong>{{ connection.provider.title() }}</strong> ({{ connection.sender_email }})
+    </div>
+  {% endif %}
+
+  <div class="provider-links">
+    {% for key, config in providers.items() %}
+      <a href="{{ config.guide_url }}" target="_blank" rel="noreferrer">{{ key.title() }} app password setup →</a>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}
