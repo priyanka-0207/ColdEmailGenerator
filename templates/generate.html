@@ -1,48 +1,266 @@
-{% extends "base.html" %}
-{% block title %}Generate Draft · Cold Email Studio{% endblock %}
-{% block content %}
-<section class="card single">
-  <div class="card-head">
-    <h2>Step 2: Generate your cold email</h2>
-    <p>Paste your resume context and choose your tone.</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generate - ColdMail AI</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f0c29, #1a1a40, #302b63);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: #e0d7f5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .orb { position: fixed; border-radius: 50%; filter: blur(80px); opacity: 0.15; pointer-events: none; z-index: 0; }
+  .orb-1 { width: 400px; height: 400px; background: #a78bfa; top: -100px; left: -100px; }
+  .orb-2 { width: 300px; height: 300px; background: #7c5cbf; bottom: -50px; right: -50px; }
+  .orb-3 { width: 200px; height: 200px; background: #c9a4f5; top: 50%; left: 60%; }
+
+  .container { position: relative; z-index: 1; width: 100%; max-width: 620px; padding: 24px 16px; }
+
+  .header { text-align: center; margin: 32px 0 36px; }
+  .logo { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 12px; text-decoration: none; }
+  .logo-icon { width: 44px; height: 44px; background: linear-gradient(135deg, #a78bfa, #7c5cbf); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+  .logo-text { font-size: 1.6rem; font-weight: 800; background: linear-gradient(90deg, #c9a4f5, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .header p { color: #8a7fa0; font-size: 0.92rem; margin-top: 4px; }
+
+  .progress { display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 32px; }
+  .step { display: flex; align-items: center; gap: 8px; }
+  .step-circle { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700; }
+  .step-circle.active { background: linear-gradient(135deg, #a78bfa, #7c5cbf); color: #fff; box-shadow: 0 0 20px rgba(167,139,250,0.4); }
+  .step-circle.done { background: rgba(74,222,128,0.2); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
+  .step-circle.inactive { background: rgba(255,255,255,0.06); color: #6b5f80; }
+  .step-label { font-size: 0.82rem; font-weight: 600; }
+  .step-label.active { color: #c9a4f5; }
+  .step-label.done { color: #4ade80; }
+  .step-label.inactive { color: #6b5f80; }
+  .step-line { width: 50px; height: 2px; margin: 0 8px; border-radius: 2px; }
+  .step-line.active { background: #a78bfa; }
+  .step-line.done { background: #4ade80; }
+  .step-line.inactive { background: rgba(255,255,255,0.08); }
+
+  .card { background: rgba(255,255,255,0.04); backdrop-filter: blur(24px); border-radius: 20px; border: 1px solid rgba(201,164,245,0.1); padding: 36px 30px; box-shadow: 0 8px 40px rgba(0,0,0,0.3); margin-bottom: 20px; }
+  .card-header { margin-bottom: 24px; }
+  .card-header h2 { font-size: 1.3rem; font-weight: 700; color: #d4c4f0; display: flex; align-items: center; gap: 10px; }
+  .card-header h2 i { font-size: 1.1rem; color: #a78bfa; }
+  .card-header p { color: #8a7fa0; font-size: 0.85rem; margin-top: 6px; }
+
+  .form-group { margin-bottom: 20px; }
+  .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: #b0a3c8; margin-bottom: 8px; }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%; padding: 13px 16px; background: rgba(255,255,255,0.06); border: 1px solid rgba(201,164,245,0.15);
+    border-radius: 12px; color: #e0d7f5; font-size: 0.9rem; font-family: inherit; outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    border-color: rgba(201,164,245,0.4); box-shadow: 0 0 0 3px rgba(167,139,250,0.1);
+  }
+  .form-group input::placeholder, .form-group textarea::placeholder { color: #6b5f80; }
+  .form-group select option { background: #1a1a40; color: #e0d7f5; }
+  .form-group textarea { resize: vertical; min-height: 100px; }
+
+  /* Tone chips */
+  .tone-chips { display: flex; gap: 10px; flex-wrap: wrap; }
+  .tone-chip {
+    padding: 10px 18px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03);
+    cursor: pointer; font-weight: 600; font-size: 0.84rem; color: #8a7fa0; transition: all 0.2s;
+  }
+  .tone-chip:hover { border-color: rgba(201,164,245,0.25); background: rgba(201,164,245,0.05); }
+  .tone-chip.selected { border-color: rgba(201,164,245,0.4); background: rgba(167,139,250,0.12); color: #c9a4f5; }
+
+  /* Two column */
+  .row { display: flex; gap: 16px; }
+  .row .form-group { flex: 1; }
+
+  .btn-row { display: flex; gap: 12px; margin-top: 8px; }
+  .btn-primary {
+    flex: 1; padding: 14px; background: linear-gradient(135deg, #a78bfa, #7c5cbf); border: none; border-radius: 12px;
+    color: #fff; font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: transform 0.15s, box-shadow 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(167,139,250,0.35); }
+  .btn-secondary {
+    padding: 14px 20px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
+    color: #a097b8; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; text-decoration: none;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .btn-secondary:hover { border-color: rgba(201,164,245,0.25); color: #c9a4f5; }
+
+  /* Generated email preview */
+  .email-preview {
+    background: rgba(255,255,255,0.04); border-radius: 14px; border: 1px solid rgba(201,164,245,0.1);
+    padding: 24px 20px; margin-top: 20px; display: none;
+  }
+  .email-preview.show { display: block; }
+  .email-preview h3 { font-size: 0.9rem; color: #a78bfa; margin-bottom: 6px; }
+  .email-subject { font-size: 1rem; font-weight: 700; color: #d4c4f0; margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .email-body { font-size: 0.88rem; color: #b8aed0; line-height: 1.8; white-space: pre-wrap; }
+  .email-actions { display: flex; gap: 10px; margin-top: 18px; }
+  .btn-copy {
+    padding: 10px 18px; border-radius: 10px; border: 1px solid rgba(201,164,245,0.2); background: rgba(201,164,245,0.08);
+    color: #c9a4f5; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px;
+  }
+  .btn-copy:hover { background: rgba(201,164,245,0.15); }
+  .btn-copy.copied { background: rgba(74,222,128,0.15); border-color: rgba(74,222,128,0.3); color: #4ade80; }
+  .btn-schedule {
+    padding: 10px 18px; border-radius: 10px; border: none; background: linear-gradient(135deg, #a78bfa, #7c5cbf);
+    color: #fff; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; text-decoration: none;
+  }
+
+  /* Loading spinner */
+  .spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .footer { text-align: center; margin-top: 40px; padding-bottom: 24px; color: #6b5f80; font-size: 0.78rem; }
+  .footer a { color: #a78bfa; text-decoration: none; }
+
+  @media (max-width: 480px) {
+    .card { padding: 24px 18px; }
+    .row { flex-direction: column; gap: 0; }
+    .step-line { width: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<div class="container">
+
+  <div class="header">
+    <a href="/" class="logo">
+      <div class="logo-icon">✉️</div>
+      <span class="logo-text">ColdMail AI</span>
+    </a>
   </div>
 
-  <form method="post" action="{{ url_for('generate') }}" class="form-grid">
-    <label>Resume context
-      <textarea name="resume_context" rows="7" placeholder="• Increased reply rate by 30%\n• Built outbound automation\n• Booked 70+ meetings" required></textarea>
-    </label>
-
-    <div class="split">
-      <label>Target company
-        <input name="target_company" placeholder="Acme Inc" />
-      </label>
-      <label>Target role
-        <input name="target_role" placeholder="Sales Development Representative" />
-      </label>
+  <div class="progress">
+    <div class="step">
+      <div class="step-circle done">✓</div>
+      <span class="step-label done">Connect</span>
     </div>
-
-    <div class="split">
-      <label>Recipient first name
-        <input name="recipient_name" placeholder="Taylor" />
-      </label>
-      <label>Tone
-        <select name="tone">
-          <option value="friendly">Friendly</option>
-          <option value="confident">Confident</option>
-          <option value="direct">Direct</option>
-        </select>
-      </label>
+    <div class="step-line done"></div>
+    <div class="step">
+      <div class="step-circle active">2</div>
+      <span class="step-label active">Generate</span>
     </div>
-
-    <button type="submit">Generate and continue</button>
-  </form>
-
-  {% if generated_subject or generated_body %}
-  <div class="preview">
-    <h3>Last generated draft</h3>
-    <p><strong>Subject:</strong> {{ generated_subject }}</p>
-    <pre>{{ generated_body }}</pre>
+    <div class="step-line inactive"></div>
+    <div class="step">
+      <div class="step-circle inactive">3</div>
+      <span class="step-label inactive">Schedule</span>
+    </div>
   </div>
-  {% endif %}
-</section>
-{% endblock %}
+
+  <div class="card">
+    <div class="card-header">
+      <h2><i class="fas fa-wand-magic-sparkles"></i> Generate Cold Email</h2>
+      <p>Fill in the details and let AI craft the perfect outreach</p>
+    </div>
+
+    <div class="form-group">
+      <label>Resume Context <span style="color:#6b5f80;font-weight:400;">(bullet points work best)</span></label>
+      <textarea id="resume" placeholder="Led outbound campaigns, improved conversion 40%..."></textarea>
+    </div>
+
+    <div class="row">
+      <div class="form-group">
+        <label>Target Company</label>
+        <input type="text" id="company" placeholder="Acme Inc">
+      </div>
+      <div class="form-group">
+        <label>Target Role</label>
+        <input type="text" id="role" placeholder="Data Scientist">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Recipient First Name <span style="color:#6b5f80;font-weight:400;">(optional)</span></label>
+      <input type="text" id="recipient" placeholder="Taylor">
+    </div>
+
+    <div class="form-group">
+      <label>Tone</label>
+      <div class="tone-chips">
+        <div class="tone-chip selected" onclick="selectTone(this,'professional')">Professional</div>
+        <div class="tone-chip" onclick="selectTone(this,'friendly')">Friendly</div>
+        <div class="tone-chip" onclick="selectTone(this,'bold')">Bold & Direct</div>
+        <div class="tone-chip" onclick="selectTone(this,'witty')">Witty</div>
+      </div>
+      <input type="hidden" id="tone" value="professional">
+    </div>
+
+    <div class="btn-row">
+      <a href="/" class="btn-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+      <button class="btn-primary" id="generateBtn" onclick="generate()">
+        <i class="fas fa-sparkles"></i> Generate Email
+      </button>
+    </div>
+
+    <!-- Email Preview -->
+    <div class="email-preview" id="emailPreview">
+      <h3>Generated Email</h3>
+      <div class="email-subject" id="emailSubject"></div>
+      <div class="email-body" id="emailBody"></div>
+      <div class="email-actions">
+        <button class="btn-copy" id="copyBtn" onclick="copyEmail()">
+          <i class="fas fa-copy"></i> Copy
+        </button>
+        <a href="/schedule" class="btn-schedule">
+          <i class="fas fa-clock"></i> Schedule Send →
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Built by <a href="https://www.linkedin.com/in/priyanka-bhutada/">Priyanka Bhutada</a>
+  </div>
+
+</div>
+
+<script>
+function selectTone(el, val) {
+  document.querySelectorAll('.tone-chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('tone').value = val;
+}
+
+function generate() {
+  const btn = document.getElementById('generateBtn');
+  btn.innerHTML = '<span class="spinner"></span> Generating...';
+  btn.disabled = true;
+
+  // Simulate generation — replace with your Flask POST /generate
+  setTimeout(() => {
+    document.getElementById('emailSubject').textContent = 'Quick question about the Data Scientist role at Acme Inc';
+    document.getElementById('emailBody').textContent = `Hi Taylor,\n\nI came across the Data Scientist opening at Acme Inc and was excited by the team's work on predictive analytics.\n\nIn my previous role, I led outbound campaigns that improved conversion by 40% using machine learning models. I'd love to bring that same data-driven approach to your team.\n\nWould you be open to a quick 15-minute chat this week?\n\nBest,\nPriyanka`;
+
+    document.getElementById('emailPreview').classList.add('show');
+    btn.innerHTML = '<i class="fas fa-rotate"></i> Regenerate';
+    btn.disabled = false;
+  }, 2000);
+}
+
+function copyEmail() {
+  const subject = document.getElementById('emailSubject').textContent;
+  const body = document.getElementById('emailBody').textContent;
+  navigator.clipboard.writeText(`Subject: ${subject}\n\n${body}`);
+
+  const btn = document.getElementById('copyBtn');
+  btn.classList.add('copied');
+  btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+  setTimeout(() => {
+    btn.classList.remove('copied');
+    btn.innerHTML = '<i class="fas fa-copy"></i> Copy';
+  }, 2000);
+}
+</script>
+
+</body>
+</html>

@@ -1,70 +1,289 @@
-{% extends "base.html" %}
-{% block title %}Schedule Send · Cold Email Studio{% endblock %}
-{% block content %}
-<section class="card single">
-  <div class="card-head">
-    <h2>Step 3: Review and schedule</h2>
-    <p>Finalize your message and pick a send time.</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Schedule - ColdMail AI</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f0c29, #1a1a40, #302b63);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: #e0d7f5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .orb { position: fixed; border-radius: 50%; filter: blur(80px); opacity: 0.15; pointer-events: none; z-index: 0; }
+  .orb-1 { width: 400px; height: 400px; background: #a78bfa; top: -100px; left: -100px; }
+  .orb-2 { width: 300px; height: 300px; background: #7c5cbf; bottom: -50px; right: -50px; }
+  .orb-3 { width: 200px; height: 200px; background: #c9a4f5; top: 50%; left: 60%; }
+
+  .container { position: relative; z-index: 1; width: 100%; max-width: 680px; padding: 24px 16px; }
+
+  .header { text-align: center; margin: 32px 0 36px; }
+  .logo { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 12px; text-decoration: none; }
+  .logo-icon { width: 44px; height: 44px; background: linear-gradient(135deg, #a78bfa, #7c5cbf); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+  .logo-text { font-size: 1.6rem; font-weight: 800; background: linear-gradient(90deg, #c9a4f5, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+  .progress { display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 32px; }
+  .step { display: flex; align-items: center; gap: 8px; }
+  .step-circle { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700; }
+  .step-circle.active { background: linear-gradient(135deg, #a78bfa, #7c5cbf); color: #fff; box-shadow: 0 0 20px rgba(167,139,250,0.4); }
+  .step-circle.done { background: rgba(74,222,128,0.2); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
+  .step-label { font-size: 0.82rem; font-weight: 600; }
+  .step-label.active { color: #c9a4f5; }
+  .step-label.done { color: #4ade80; }
+  .step-line { width: 50px; height: 2px; margin: 0 8px; border-radius: 2px; }
+  .step-line.done { background: #4ade80; }
+
+  .card { background: rgba(255,255,255,0.04); backdrop-filter: blur(24px); border-radius: 20px; border: 1px solid rgba(201,164,245,0.1); padding: 36px 30px; box-shadow: 0 8px 40px rgba(0,0,0,0.3); margin-bottom: 20px; }
+  .card-header { margin-bottom: 24px; }
+  .card-header h2 { font-size: 1.3rem; font-weight: 700; color: #d4c4f0; display: flex; align-items: center; gap: 10px; }
+  .card-header h2 i { font-size: 1.1rem; color: #a78bfa; }
+  .card-header p { color: #8a7fa0; font-size: 0.85rem; margin-top: 6px; }
+
+  .form-group { margin-bottom: 20px; }
+  .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: #b0a3c8; margin-bottom: 8px; }
+  .form-group input, .form-group textarea {
+    width: 100%; padding: 13px 16px; background: rgba(255,255,255,0.06); border: 1px solid rgba(201,164,245,0.15);
+    border-radius: 12px; color: #e0d7f5; font-size: 0.9rem; font-family: inherit; outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .form-group input:focus, .form-group textarea:focus {
+    border-color: rgba(201,164,245,0.4); box-shadow: 0 0 0 3px rgba(167,139,250,0.1);
+  }
+  .form-group input::placeholder, .form-group textarea::placeholder { color: #6b5f80; }
+  .form-group textarea { resize: vertical; min-height: 140px; line-height: 1.7; }
+
+  /* Date time input styling */
+  input[type="datetime-local"] {
+    color-scheme: dark;
+  }
+
+  .btn-row { display: flex; gap: 12px; margin-top: 8px; }
+  .btn-primary {
+    flex: 1; padding: 14px; background: linear-gradient(135deg, #a78bfa, #7c5cbf); border: none; border-radius: 12px;
+    color: #fff; font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: transform 0.15s, box-shadow 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(167,139,250,0.35); }
+  .btn-secondary {
+    padding: 14px 20px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
+    color: #a097b8; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; text-decoration: none;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .btn-secondary:hover { border-color: rgba(201,164,245,0.25); color: #c9a4f5; }
+
+  .status { text-align: center; padding: 12px; border-radius: 10px; margin-top: 16px; font-size: 0.85rem; font-weight: 600; display: none; }
+  .status.success { background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.2); color: #4ade80; display: block; }
+
+  /* Scheduled emails table */
+  .table-card { margin-top: 24px; }
+  .table-card h3 { font-size: 1.1rem; font-weight: 700; color: #d4c4f0; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .table-card h3 i { color: #a78bfa; }
+
+  .email-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+  .email-table thead th {
+    text-align: left; padding: 12px 14px; font-size: 0.78rem; font-weight: 700; color: #8a7fa0;
+    text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .email-table tbody tr {
+    transition: background 0.15s;
+  }
+  .email-table tbody tr:hover {
+    background: rgba(167,139,250,0.04);
+  }
+  .email-table tbody td {
+    padding: 14px 14px; font-size: 0.85rem; color: #b8aed0; border-bottom: 1px solid rgba(255,255,255,0.03);
+  }
+  .status-badge {
+    display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700;
+  }
+  .status-badge.pending { background: rgba(250,204,21,0.12); color: #facc15; border: 1px solid rgba(250,204,21,0.2); }
+  .status-badge.sent { background: rgba(74,222,128,0.12); color: #4ade80; border: 1px solid rgba(74,222,128,0.2); }
+  .status-badge.failed { background: rgba(248,113,113,0.12); color: #f87171; border: 1px solid rgba(248,113,113,0.2); }
+
+  .empty-state {
+    text-align: center; padding: 32px 20px; color: #6b5f80; font-size: 0.88rem;
+  }
+  .empty-state i { font-size: 2rem; margin-bottom: 10px; display: block; opacity: 0.5; }
+
+  .footer { text-align: center; margin-top: 40px; padding-bottom: 24px; color: #6b5f80; font-size: 0.78rem; }
+  .footer a { color: #a78bfa; text-decoration: none; }
+
+  @media (max-width: 480px) {
+    .card { padding: 24px 18px; }
+    .email-table { font-size: 0.78rem; }
+    .email-table thead th, .email-table tbody td { padding: 10px 8px; }
+    .step-line { width: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<div class="container">
+
+  <div class="header">
+    <a href="/" class="logo">
+      <div class="logo-icon">✉️</div>
+      <span class="logo-text">ColdMail AI</span>
+    </a>
   </div>
 
-  <form method="post" action="{{ url_for('schedule') }}" class="form-grid">
-    <div class="split">
-      <label>Recipient email
-        <input type="email" name="recipient_email" required placeholder="recruiter@company.com" />
-      </label>
-      <label>Send at (your local time)
-        <input type="datetime-local" name="send_at" required />
-      </label>
+  <div class="progress">
+    <div class="step">
+      <div class="step-circle done">✓</div>
+      <span class="step-label done">Connect</span>
+    </div>
+    <div class="step-line done"></div>
+    <div class="step">
+      <div class="step-circle done">✓</div>
+      <span class="step-label done">Generate</span>
+    </div>
+    <div class="step-line done"></div>
+    <div class="step">
+      <div class="step-circle active">3</div>
+      <span class="step-label active">Schedule</span>
+    </div>
+  </div>
+
+  <!-- Schedule Form -->
+  <div class="card">
+    <div class="card-header">
+      <h2><i class="fas fa-paper-plane"></i> Schedule & Send</h2>
+      <p>Review your email and pick the perfect send time</p>
     </div>
 
-    <label>Subject
-      <input name="subject" required value="{{ generated_subject or '' }}" placeholder="Generate subject on step 2" />
-    </label>
+    <div class="form-group">
+      <label>Recipient Email</label>
+      <input type="email" id="recipientEmail" placeholder="recruiter@company.com">
+    </div>
 
-    <label>Email body
-      <textarea name="body" rows="11" required placeholder="Generate body on step 2">{{ generated_body or '' }}</textarea>
-    </label>
+    <div class="form-group">
+      <label>Subject</label>
+      <input type="text" id="subject" value="Quick question about the Data Scientist role at Acme Inc">
+    </div>
 
-    <button type="submit">Schedule email</button>
-  </form>
-</section>
+    <div class="form-group">
+      <label>Email Body</label>
+      <textarea id="body">Hi Taylor,
 
-<section class="card full-width">
-  <div class="card-head">
-    <h2>Recent scheduled emails</h2>
-    <p>Latest 15 jobs from your local scheduler queue.</p>
+I came across the Data Scientist opening at Acme Inc and was excited by the team's work on predictive analytics.
+
+In my previous role, I led outbound campaigns that improved conversion by 40% using machine learning models. I'd love to bring that same data-driven approach to your team.
+
+Would you be open to a quick 15-minute chat this week?
+
+Best,
+Priyanka</textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Send At <span style="color:#6b5f80;font-weight:400;">(your local time)</span></label>
+      <input type="datetime-local" id="sendAt">
+    </div>
+
+    <div class="btn-row">
+      <a href="/generate" class="btn-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+      <button class="btn-primary" onclick="scheduleEmail()">
+        <i class="fas fa-clock"></i> Schedule Email
+      </button>
+    </div>
+
+    <div id="status" class="status"></div>
   </div>
-  <div class="table-wrap">
-    <table>
+
+  <!-- Recent scheduled -->
+  <div class="card table-card">
+    <h3><i class="fas fa-list-check"></i> Scheduled Emails</h3>
+
+    <table class="email-table" id="emailTable">
       <thead>
         <tr>
-          <th>ID</th>
-          <th>Provider</th>
-          <th>From</th>
           <th>To</th>
           <th>Subject</th>
-          <th>Send UTC</th>
+          <th>Send At</th>
           <th>Status</th>
-          <th>Error</th>
         </tr>
       </thead>
-      <tbody>
-        {% for job in jobs %}
-        <tr>
-          <td>{{ job.id }}</td>
-          <td><span class="pill">{{ job.provider }}</span></td>
-          <td>{{ job.sender_email }}</td>
-          <td>{{ job.recipient_email }}</td>
-          <td>{{ job.subject }}</td>
-          <td>{{ job.send_at_utc }}</td>
-          <td><span class="status {{ job.status }}">{{ job.status }}</span></td>
-          <td>{{ job.error_message or '-' }}</td>
-        </tr>
-        {% else %}
-        <tr><td colspan="8" class="empty">No scheduled emails yet.</td></tr>
-        {% endfor %}
+      <tbody id="tableBody">
+        <!-- Populated dynamically -->
       </tbody>
     </table>
+
+    <div class="empty-state" id="emptyState">
+      <i class="fas fa-inbox"></i>
+      No scheduled emails yet. Schedule your first one above!
+    </div>
   </div>
-</section>
-{% endblock %}
+
+  <div class="footer">
+    Built by <a href="https://www.linkedin.com/in/priyanka-bhutada/">Priyanka Bhutada</a>
+  </div>
+
+</div>
+
+<script>
+// Demo data — in Flask, this would come from your backend
+let emails = [];
+
+function scheduleEmail() {
+  const to = document.getElementById('recipientEmail').value;
+  const subject = document.getElementById('subject').value;
+  const sendAt = document.getElementById('sendAt').value;
+
+  if (!to || !subject || !sendAt) {
+    alert('Please fill in all fields');
+    return;
+  }
+
+  // In Flask, this would POST to /schedule
+  emails.push({ to, subject, sendAt, status: 'pending' });
+  renderTable();
+
+  const status = document.getElementById('status');
+  status.className = 'status success';
+  status.innerHTML = '<i class="fas fa-check-circle"></i> Email scheduled successfully!';
+  status.style.display = 'block';
+
+  document.getElementById('recipientEmail').value = '';
+  document.getElementById('sendAt').value = '';
+
+  setTimeout(() => { status.style.display = 'none'; }, 3000);
+}
+
+function renderTable() {
+  const tbody = document.getElementById('tableBody');
+  const empty = document.getElementById('emptyState');
+
+  if (emails.length === 0) {
+    empty.style.display = 'block';
+    tbody.innerHTML = '';
+    return;
+  }
+
+  empty.style.display = 'none';
+  tbody.innerHTML = emails.map(e => {
+    const date = new Date(e.sendAt);
+    const formatted = date.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true });
+    const statusClass = e.status;
+    return `<tr>
+      <td>${e.to}</td>
+      <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${e.subject}</td>
+      <td>${formatted}</td>
+      <td><span class="status-badge ${statusClass}"><i class="fas fa-circle" style="font-size:6px;"></i> ${e.status}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+renderTable();
+</script>
+
+</body>
+</html>
