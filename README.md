@@ -1,15 +1,10 @@
 # ColdEmailGenerator
 
-A Flask app that helps job-seekers:
+A simple Flask app that helps job-seekers:
 
-1. connect a Gmail account for free (using app passwords),
+1. connect a Gmail or Outlook account for free (using app passwords),
 2. generate a cold email from resume context,
 3. schedule the email to send later.
-
-The UI uses a **3-page flow**:
-- `/connect` → connect Gmail inbox
-- `/generate` → generate draft from resume context
-- `/schedule` → review + schedule and see recent jobs
 
 ## Run locally
 
@@ -17,33 +12,16 @@ The UI uses a **3-page flow**:
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env
 python app.py
 ```
 
-Open `http://localhost:5000`.
-
-## Deploy (Render quick start)
-
-This repo includes `render.yaml` + `Procfile` for one-click style deployment.
-
-1. Push repo to GitHub.
-2. Create a new **Web Service** on Render from the repo.
-3. Render will use:
-   - Build: `pip install -r requirements.txt`
-   - Start: `gunicorn -w 1 -k gthread -b 0.0.0.0:$PORT app:app`
-4. Set env vars:
-   - `SECRET_KEY` (required)
-   - `RUN_SCHEDULER=true`
-   - `SESSION_COOKIE_SECURE=true` (for HTTPS)
-   - `FLASK_DEBUG=false`
+Open http://localhost:5000.
 
 ## Notes
 
-- Gmail sending uses SMTP + app passwords (free tier).
+- Gmail and Outlook sending uses SMTP + app passwords (free tiers).
 - Scheduled jobs are stored in `scheduler.db` (SQLite).
-- For this in-process scheduler design, run a single web instance (`-w 1`) to avoid duplicate sends.
-- For larger scale, migrate queueing/storage to dedicated worker + Postgres/Redis.
+- This is a starter project; do not deploy with the default `secret_key`.
 
 ## Test
 

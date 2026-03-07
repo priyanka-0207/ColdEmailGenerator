@@ -5,6 +5,12 @@
   <div class="card-head">
     <h2>Page 3: Schedule send</h2>
     <p>Review your draft and schedule the perfect send time.</p>
+{% block title %}Schedule Send · Cold Email Studio{% endblock %}
+{% block content %}
+<section class="card single">
+  <div class="card-head">
+    <h2>Step 3: Review and schedule</h2>
+    <p>Finalize your message and pick a send time.</p>
   </div>
 
   <form method="post" action="{{ url_for('schedule') }}" class="form-grid">
@@ -23,6 +29,11 @@
 
     <label>Email body
       <textarea name="body" rows="11" required placeholder="Generate body on page 2">{{ generated_body or '' }}</textarea>
+      <input name="subject" required value="{{ generated_subject or '' }}" placeholder="Generate subject on step 2" />
+    </label>
+
+    <label>Email body
+      <textarea name="body" rows="11" required placeholder="Generate body on step 2">{{ generated_body or '' }}</textarea>
     </label>
 
     <button type="submit">Schedule email</button>
@@ -33,6 +44,7 @@
   <div class="card-head">
     <h2>Recent scheduled emails</h2>
     <p>Your latest jobs from the local scheduler queue.</p>
+    <p>Latest 15 jobs from your local scheduler queue.</p>
   </div>
   <div class="table-wrap">
     <table>

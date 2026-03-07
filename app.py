@@ -23,6 +23,7 @@ app.secret_key = os.getenv("SECRET_KEY", "dev-change-me")
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 app.config["SESSION_COOKIE_SECURE"] = os.getenv("SESSION_COOKIE_SECURE", "false").lower() == "true"
+app.secret_key = "dev-change-me"
 
 
 @dataclass
@@ -41,6 +42,13 @@ PROVIDERS = {
 }
 
 _scheduler_started = False
+
+    "outlook": ProviderConfig(
+        smtp_server="smtp.office365.com",
+        smtp_port=587,
+        guide_url="https://support.microsoft.com/en-us/account-billing/how-to-get-and-use-app-passwords-5896ed9b-4263-e681-128a-a6f2979a7944",
+    ),
+}
 
 
 def get_db() -> sqlite3.Connection:
@@ -172,6 +180,19 @@ def connect_page():
         current_step="connect",
         connection=connection,
     )
+@app.route("/", methods=["GET"])
+def index():
+    with closing(get_db()) as conn:
+        jobs = conn.execute(
+            """
+            SELECT id, provider, sender_email, recipient_email, subject, send_at_utc, status, error_message
+            FROM scheduled_emails
+            ORDER BY datetime(send_at_utc) DESC
+            LIMIT 15
+            """
+        ).fetchall()
+
+    return render_template("index.html", providers=PROVIDERS, jobs=jobs)
 
 
 @app.route("/connect", methods=["POST"])
@@ -183,6 +204,9 @@ def connect_account():
     if provider != "gmail" or not sender_email or not sender_password:
         flash("Please use Gmail and provide sender email + app password.", "error")
         return redirect(url_for("connect_page"))
+    if provider not in PROVIDERS or not sender_email or not sender_password:
+        flash("Please choose Gmail/Outlook and provide sender email + app password.", "error")
+        return redirect(url_for("index"))
 
     session["connection"] = {
         "provider": provider,
@@ -201,6 +225,8 @@ def generate_page():
         generated_subject=session.get("generated_subject", ""),
         generated_body=session.get("generated_body", ""),
     )
+    flash(f"Connected {provider.title()} account for scheduling.", "success")
+    return redirect(url_for("index"))
 
 
 @app.route("/generate", methods=["POST"])
@@ -233,6 +259,22 @@ def schedule_page():
         generated_subject=session.get("generated_subject", ""),
         generated_body=session.get("generated_body", ""),
         jobs=fetch_recent_jobs(),
+    with closing(get_db()) as conn:
+        jobs = conn.execute(
+            """
+            SELECT id, provider, sender_email, recipient_email, subject, send_at_utc, status, error_message
+            FROM scheduled_emails
+            ORDER BY datetime(send_at_utc) DESC
+            LIMIT 15
+            """
+        ).fetchall()
+
+    return render_template(
+        "index.html",
+        providers=PROVIDERS,
+        generated_subject=subject,
+        generated_body=body,
+        jobs=jobs,
     )
 
 
@@ -242,6 +284,8 @@ def schedule():
     if not connection:
         flash("Connect Gmail first.", "error")
         return redirect(url_for("connect_page"))
+        flash("Connect Gmail or Outlook first.", "error")
+        return redirect(url_for("index"))
 
     recipient_email = request.form.get("recipient_email", "").strip()
     subject = request.form.get("subject", "").strip()
@@ -251,6 +295,7 @@ def schedule():
     if not recipient_email or not subject or not body or not send_at_local:
         flash("Fill recipient, subject, body, and schedule time.", "error")
         return redirect(url_for("schedule_page"))
+        return redirect(url_for("index"))
 
     try:
         send_at = datetime.fromisoformat(send_at_local)
@@ -258,6 +303,7 @@ def schedule():
     except ValueError:
         flash("Invalid schedule date/time.", "error")
         return redirect(url_for("schedule_page"))
+        return redirect(url_for("index"))
 
     with closing(get_db()) as conn:
         conn.execute(
@@ -291,3 +337,11 @@ if __name__ == "__main__":
         host="0.0.0.0",
         port=int(os.getenv("PORT", "5000")),
     )
+    return redirect(url_for("index"))
+
+
+if __name__ == "__main__":
+    init_db()
+    thread = threading.Thread(target=scheduler_loop, daemon=True)
+    thread.start()
+    app.run(debug=True, host="0.0.0.0", port=5000)

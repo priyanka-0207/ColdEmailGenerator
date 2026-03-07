@@ -5,6 +5,12 @@
   <div class="card-head">
     <h2>Page 2: Generate cold email</h2>
     <p>Turn your resume context into a polished outreach message.</p>
+{% block title %}Generate Draft · Cold Email Studio{% endblock %}
+{% block content %}
+<section class="card single">
+  <div class="card-head">
+    <h2>Step 2: Generate your cold email</h2>
+    <p>Paste your resume context and choose your tone.</p>
   </div>
 
   <form method="post" action="{{ url_for('generate') }}" class="form-grid">
@@ -35,11 +41,13 @@
     </div>
 
     <button type="submit">Generate draft</button>
+    <button type="submit">Generate and continue</button>
   </form>
 
   {% if generated_subject or generated_body %}
   <div class="preview">
     <h3>Latest generated draft</h3>
+    <h3>Last generated draft</h3>
     <p><strong>Subject:</strong> {{ generated_subject }}</p>
     <pre>{{ generated_body }}</pre>
   </div>

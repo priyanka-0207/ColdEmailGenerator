@@ -156,6 +156,60 @@ button {
   font-weight: 800;
   color: #07111b;
   background: linear-gradient(135deg, var(--cyan), #7cf7ff);
+  color-scheme: light;
+  font-family: Inter, Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: #f3f6fb;
+  color: #1a2333;
+}
+
+.container {
+  max-width: 900px;
+  margin: 32px auto;
+  padding: 0 16px 48px;
+}
+
+h1, h2 {
+  margin-top: 0;
+}
+
+.muted {
+  color: #4b5a74;
+}
+
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 16px 0;
+  box-shadow: 0 2px 8px rgba(10, 20, 40, 0.08);
+}
+
+.grid {
+  display: grid;
+  gap: 12px;
+}
+
+label {
+  display: grid;
+  gap: 6px;
+  font-weight: 600;
+}
+
+input, select, textarea, button {
+  font: inherit;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #c8d1e2;
+}
+
+button {
+  background: #2554d8;
+  color: #fff;
+  border: 0;
   cursor: pointer;
   width: fit-content;
 }
@@ -239,4 +293,31 @@ th { background: #101a2c; color: #c9d6f8; }
 
 @media (max-width: 640px) {
   .split { grid-template-columns: 1fr; }
+.flash {
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.flash.success {
+  background: #d8f8e4;
+}
+
+.flash.error {
+  background: #ffe2e2;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid #e4e8f0;
+  padding: 8px;
+  text-align: left;
 }
