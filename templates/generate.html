@@ -1,4 +1,10 @@
 {% extends "base.html" %}
+{% block title %}Page 2 · Generate Cold Email{% endblock %}
+{% block content %}
+<section class="card single">
+  <div class="card-head">
+    <h2>Page 2: Generate cold email</h2>
+    <p>Turn your resume context into a polished outreach message.</p>
 {% block title %}Generate Draft · Cold Email Studio{% endblock %}
 {% block content %}
 <section class="card single">
@@ -34,11 +40,13 @@
       </label>
     </div>
 
+    <button type="submit">Generate draft</button>
     <button type="submit">Generate and continue</button>
   </form>
 
   {% if generated_subject or generated_body %}
   <div class="preview">
+    <h3>Latest generated draft</h3>
     <h3>Last generated draft</h3>
     <p><strong>Subject:</strong> {{ generated_subject }}</p>
     <pre>{{ generated_body }}</pre>
