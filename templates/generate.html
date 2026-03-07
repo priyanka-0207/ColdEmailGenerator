@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Page 2 · Generate Cold Email{% endblock %}
+{% block content %}
+<section class="card single">
+  <div class="card-head">
+    <h2>Page 2: Generate cold email</h2>
+    <p>Turn your resume context into a polished outreach message.</p>
+  </div>
+
+  <form method="post" action="{{ url_for('generate') }}" class="form-grid">
+    <label>Resume context
+      <textarea name="resume_context" rows="7" placeholder="• Increased reply rate by 30%\n• Built outbound automation\n• Booked 70+ meetings" required></textarea>
+    </label>
+
+    <div class="split">
+      <label>Target company
+        <input name="target_company" placeholder="Acme Inc" />
+      </label>
+      <label>Target role
+        <input name="target_role" placeholder="Sales Development Representative" />
+      </label>
+    </div>
+
+    <div class="split">
+      <label>Recipient first name
+        <input name="recipient_name" placeholder="Taylor" />
+      </label>
+      <label>Tone
+        <select name="tone">
+          <option value="friendly">Friendly</option>
+          <option value="confident">Confident</option>
+          <option value="direct">Direct</option>
+        </select>
+      </label>
+    </div>
+
+    <button type="submit">Generate draft</button>
+  </form>
+
+  {% if generated_subject or generated_body %}
+  <div class="preview">
+    <h3>Latest generated draft</h3>
+    <p><strong>Subject:</strong> {{ generated_subject }}</p>
+    <pre>{{ generated_body }}</pre>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}
