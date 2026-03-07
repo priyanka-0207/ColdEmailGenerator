@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Schedule Send · Cold Email Studio{% endblock %}
+{% block content %}
+<section class="card single">
+  <div class="card-head">
+    <h2>Step 3: Review and schedule</h2>
+    <p>Finalize your message and pick a send time.</p>
+  </div>
+
+  <form method="post" action="{{ url_for('schedule') }}" class="form-grid">
+    <div class="split">
+      <label>Recipient email
+        <input type="email" name="recipient_email" required placeholder="recruiter@company.com" />
+      </label>
+      <label>Send at (your local time)
+        <input type="datetime-local" name="send_at" required />
+      </label>
+    </div>
+
+    <label>Subject
+      <input name="subject" required value="{{ generated_subject or '' }}" placeholder="Generate subject on step 2" />
+    </label>
+
+    <label>Email body
+      <textarea name="body" rows="11" required placeholder="Generate body on step 2">{{ generated_body or '' }}</textarea>
+    </label>
+
+    <button type="submit">Schedule email</button>
+  </form>
+</section>
+
+<section class="card full-width">
+  <div class="card-head">
+    <h2>Recent scheduled emails</h2>
+    <p>Latest 15 jobs from your local scheduler queue.</p>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Provider</th>
+          <th>From</th>
+          <th>To</th>
+          <th>Subject</th>
+          <th>Send UTC</th>
+          <th>Status</th>
+          <th>Error</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for job in jobs %}
+        <tr>
+          <td>{{ job.id }}</td>
+          <td><span class="pill">{{ job.provider }}</span></td>
+          <td>{{ job.sender_email }}</td>
+          <td>{{ job.recipient_email }}</td>
+          <td>{{ job.subject }}</td>
+          <td>{{ job.send_at_utc }}</td>
+          <td><span class="status {{ job.status }}">{{ job.status }}</span></td>
+          <td>{{ job.error_message or '-' }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="8" class="empty">No scheduled emails yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
