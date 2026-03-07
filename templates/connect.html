@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Page 1 · Connect Gmail / Outlook{% endblock %}
+{% block content %}
+<section class="card single">
+  <div class="card-head">
+    <p class="card-kicker">Step 1</p>
+    <h2>🔌 Connect Your Email</h2>
+    <p>Use an app password so you can send for free via SMTP</p>
+  </div>
+
+  <form method="post" action="{{ url_for('connect_account') }}" class="form-grid">
+    <fieldset class="provider-switch">
+      <legend>Provider</legend>
+      <label class="provider-option">
+        <input type="radio" name="provider" value="gmail" {% if not connection or connection.provider == "gmail" %}checked{% endif %}>
+        <span>Gmail</span>
+      </label>
+      <label class="provider-option">
+        <input type="radio" name="provider" value="outlook" {% if connection and connection.provider == "outlook" %}checked{% endif %}>
+        <span>Outlook</span>
+      </label>
+    </fieldset>
+
+    <label>Sender Email
+      <input type="email" name="sender_email" required placeholder="you@example.com" value="{{ connection.sender_email if connection else '' }}" />
+    </label>
+    <label>App Password
+      <input type="password" name="sender_password" required placeholder="Enter your app password" />
+    </label>
+    <button type="submit" class="primary-btn">Connect and continue →</button>
+  </form>
+
+  {% if connection %}
+    <div class="info-box success-box">
+      ✅ Connected: <strong>{{ connection.provider.title() }}</strong> ({{ connection.sender_email }})
+    </div>
+  {% endif %}
+
+  <div class="provider-links">
+    {% for key, config in providers.items() %}
+      <a href="{{ config.guide_url }}" target="_blank" rel="noreferrer">{{ key.title() }} app password guide →</a>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

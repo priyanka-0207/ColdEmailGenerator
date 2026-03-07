@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Dark Mode Cold Email Studio{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body>
+  <div class="grain"></div>
+  <div class="neon neon-cyan"></div>
+  <div class="neon neon-magenta"></div>
+
+  <main class="container">
+    <header class="hero card">
+      <div>
+        <p class="eyebrow">DARK MODE WORKFLOW</p>
+        <h1>Cold Email Studio</h1>
+        <p class="muted">A polished 3-page flow to connect inbox, generate personalized outreach, and schedule delivery.</p>
+        <div class="hero-tags">
+          <span class="tag">Gmail + Outlook</span>
+          <span class="tag">Smart Drafting</span>
+          <span class="tag">Scheduled Sending</span>
+        </div>
+      </div>
+      <nav class="step-nav" aria-label="workflow steps">
+        <a href="{{ url_for('connect_page') }}" class="step-link {% if current_step == 'connect' %}active{% endif %}">1 · Connect account</a>
+        <a href="{{ url_for('generate_page') }}" class="step-link {% if current_step == 'generate' %}active{% endif %}">2 · Generate email</a>
+        <a href="{{ url_for('schedule_page') }}" class="step-link {% if current_step == 'schedule' %}active{% endif %}">3 · Schedule send</a>
+      </nav>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <section class="flash-wrap">
+        {% for category, message in messages %}
+          <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      </section>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>
