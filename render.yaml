@@ -1,17 +1,11 @@
 services:
   - type: web
-    name: cold-email-generator
-    env: python
-    plan: free
+    name: coldmail-ai
+    runtime: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn -w 1 -k gthread -b 0.0.0.0:$PORT app:app
-    healthCheckPath: /healthz
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
     envVars:
       - key: SECRET_KEY
-        generateValue: true
-      - key: RUN_SCHEDULER
-        value: "true"
-      - key: SESSION_COOKIE_SECURE
-        value: "true"
-      - key: FLASK_DEBUG
-        value: "false"
+        value: coldmail-secret-2026
+      - key: PYTHON_VERSION
+        value: 3.11.0
