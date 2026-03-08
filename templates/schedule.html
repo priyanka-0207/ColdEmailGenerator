@@ -9,281 +9,161 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     min-height: 100vh;
-    background: linear-gradient(135deg, #0f0c29, #1a1a40, #302b63);
+    background: #12101f;
+    background-image:
+      radial-gradient(ellipse at 20% 0%, rgba(120,80,200,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 100%, rgba(100,60,180,0.10) 0%, transparent 60%);
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     color: #e0d7f5;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    display: flex; flex-direction: column; align-items: center;
   }
-  .orb { position: fixed; border-radius: 50%; filter: blur(80px); opacity: 0.15; pointer-events: none; z-index: 0; }
-  .orb-1 { width: 400px; height: 400px; background: #a78bfa; top: -100px; left: -100px; }
-  .orb-2 { width: 300px; height: 300px; background: #7c5cbf; bottom: -50px; right: -50px; }
-  .orb-3 { width: 200px; height: 200px; background: #c9a4f5; top: 50%; left: 60%; }
-
-  .container { position: relative; z-index: 1; width: 100%; max-width: 680px; padding: 24px 16px; }
-
+  .container { width: 100%; max-width: 680px; padding: 24px 16px; }
   .header { text-align: center; margin: 32px 0 36px; }
-  .logo { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 12px; text-decoration: none; }
-  .logo-icon { width: 44px; height: 44px; background: linear-gradient(135deg, #a78bfa, #7c5cbf); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
-  .logo-text { font-size: 1.6rem; font-weight: 800; background: linear-gradient(90deg, #c9a4f5, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-  .progress { display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 32px; }
+  .logo { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; }
+  .logo-icon { width: 42px; height: 42px; background: linear-gradient(135deg, #a78bfa, #7c5cbf); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .logo-text { font-size: 1.55rem; font-weight: 800; color: #e0d7f5; letter-spacing: -0.3px; }
+  .progress { display: flex; align-items: center; justify-content: center; margin-bottom: 32px; }
   .step { display: flex; align-items: center; gap: 8px; }
-  .step-circle { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700; }
-  .step-circle.active { background: linear-gradient(135deg, #a78bfa, #7c5cbf); color: #fff; box-shadow: 0 0 20px rgba(167,139,250,0.4); }
-  .step-circle.done { background: rgba(74,222,128,0.2); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
-  .step-label { font-size: 0.82rem; font-weight: 600; }
-  .step-label.active { color: #c9a4f5; }
-  .step-label.done { color: #4ade80; }
-  .step-line { width: 50px; height: 2px; margin: 0 8px; border-radius: 2px; }
-  .step-line.done { background: #4ade80; }
-
-  .card { background: rgba(255,255,255,0.04); backdrop-filter: blur(24px); border-radius: 20px; border: 1px solid rgba(201,164,245,0.1); padding: 36px 30px; box-shadow: 0 8px 40px rgba(0,0,0,0.3); margin-bottom: 20px; }
-  .card-header { margin-bottom: 24px; }
-  .card-header h2 { font-size: 1.3rem; font-weight: 700; color: #d4c4f0; display: flex; align-items: center; gap: 10px; }
-  .card-header h2 i { font-size: 1.1rem; color: #a78bfa; }
-  .card-header p { color: #8a7fa0; font-size: 0.85rem; margin-top: 6px; }
-
-  .form-group { margin-bottom: 20px; }
-  .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: #b0a3c8; margin-bottom: 8px; }
-  .form-group input, .form-group textarea {
-    width: 100%; padding: 13px 16px; background: rgba(255,255,255,0.06); border: 1px solid rgba(201,164,245,0.15);
-    border-radius: 12px; color: #e0d7f5; font-size: 0.9rem; font-family: inherit; outline: none; transition: border-color 0.2s, box-shadow 0.2s;
-  }
-  .form-group input:focus, .form-group textarea:focus {
-    border-color: rgba(201,164,245,0.4); box-shadow: 0 0 0 3px rgba(167,139,250,0.1);
-  }
-  .form-group input::placeholder, .form-group textarea::placeholder { color: #6b5f80; }
-  .form-group textarea { resize: vertical; min-height: 140px; line-height: 1.7; }
-
-  /* Date time input styling */
-  input[type="datetime-local"] {
-    color-scheme: dark;
-  }
-
-  .btn-row { display: flex; gap: 12px; margin-top: 8px; }
-  .btn-primary {
-    flex: 1; padding: 14px; background: linear-gradient(135deg, #a78bfa, #7c5cbf); border: none; border-radius: 12px;
-    color: #fff; font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: transform 0.15s, box-shadow 0.2s;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-  }
-  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(167,139,250,0.35); }
-  .btn-secondary {
-    padding: 14px 20px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
-    color: #a097b8; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; text-decoration: none;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .btn-secondary:hover { border-color: rgba(201,164,245,0.25); color: #c9a4f5; }
-
-  .status { text-align: center; padding: 12px; border-radius: 10px; margin-top: 16px; font-size: 0.85rem; font-weight: 600; display: none; }
-  .status.success { background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.2); color: #4ade80; display: block; }
-
-  /* Scheduled emails table */
-  .table-card { margin-top: 24px; }
-  .table-card h3 { font-size: 1.1rem; font-weight: 700; color: #d4c4f0; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-  .table-card h3 i { color: #a78bfa; }
-
-  .email-table { width: 100%; border-collapse: separate; border-spacing: 0; }
-  .email-table thead th {
-    text-align: left; padding: 12px 14px; font-size: 0.78rem; font-weight: 700; color: #8a7fa0;
-    text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.06);
-  }
-  .email-table tbody tr {
-    transition: background 0.15s;
-  }
-  .email-table tbody tr:hover {
-    background: rgba(167,139,250,0.04);
-  }
-  .email-table tbody td {
-    padding: 14px 14px; font-size: 0.85rem; color: #b8aed0; border-bottom: 1px solid rgba(255,255,255,0.03);
-  }
-  .status-badge {
-    display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700;
-  }
-  .status-badge.pending { background: rgba(250,204,21,0.12); color: #facc15; border: 1px solid rgba(250,204,21,0.2); }
-  .status-badge.sent { background: rgba(74,222,128,0.12); color: #4ade80; border: 1px solid rgba(74,222,128,0.2); }
-  .status-badge.failed { background: rgba(248,113,113,0.12); color: #f87171; border: 1px solid rgba(248,113,113,0.2); }
-
-  .empty-state {
-    text-align: center; padding: 32px 20px; color: #6b5f80; font-size: 0.88rem;
-  }
-  .empty-state i { font-size: 2rem; margin-bottom: 10px; display: block; opacity: 0.5; }
-
-  .footer { text-align: center; margin-top: 40px; padding-bottom: 24px; color: #6b5f80; font-size: 0.78rem; }
+  .step-num { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; }
+  .step-num.active { background: linear-gradient(135deg, #a78bfa, #7c5cbf); color: #fff; box-shadow: 0 0 16px rgba(167,139,250,0.35); }
+  .step-num.done { background: rgba(74,222,128,0.15); color: #4ade80; border: 1px solid rgba(74,222,128,0.25); }
+  .step-name { font-size: 0.82rem; font-weight: 600; }
+  .step-name.active { color: #c9a4f5; }
+  .step-name.done { color: #4ade80; }
+  .step-line { width: 48px; height: 2px; margin: 0 10px; border-radius: 2px; }
+  .step-line.done { background: rgba(74,222,128,0.35); }
+  .card { background: rgba(255,255,255,0.035); border: 1px solid rgba(167,139,250,0.12); border-radius: 18px; padding: 32px 28px; margin-bottom: 20px; }
+  .card-title { font-size: 1.2rem; font-weight: 700; color: #e0d7f5; display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .card-title i { color: #a78bfa; font-size: 1rem; }
+  .card-desc { color: #7a7190; font-size: 0.85rem; margin-bottom: 24px; }
+  .form-label { display: block; font-size: 0.84rem; font-weight: 600; color: #b0a3c8; margin-bottom: 8px; }
+  .form-label span { color: #6b5f80; font-weight: 400; }
+  .form-input, .form-textarea { width: 100%; padding: 12px 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(167,139,250,0.14); border-radius: 10px; color: #e0d7f5; font-size: 0.9rem; font-family: inherit; outline: none; transition: border-color 0.2s, box-shadow 0.2s; margin-bottom: 20px; }
+  .form-input:focus, .form-textarea:focus { border-color: rgba(167,139,250,0.45); box-shadow: 0 0 0 3px rgba(167,139,250,0.08); }
+  .form-input::placeholder, .form-textarea::placeholder { color: #5a5170; }
+  .form-textarea { resize: vertical; min-height: 180px; line-height: 1.7; }
+  input[type="datetime-local"] { color-scheme: dark; }
+  .btn-row { display: flex; gap: 12px; margin-top: 4px; }
+  .btn-primary { flex: 1; padding: 14px; background: linear-gradient(135deg, #a78bfa, #7c5cbf); border: none; border-radius: 12px; color: #fff; font-size: 0.95rem; font-weight: 700; font-family: inherit; cursor: pointer; transition: transform 0.15s, box-shadow 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(167,139,250,0.3); }
+  .btn-secondary { padding: 14px 20px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: #a097b8; font-size: 0.9rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.2s; text-decoration: none; display: flex; align-items: center; gap: 8px; }
+  .btn-secondary:hover { border-color: rgba(167,139,250,0.25); color: #c9a4f5; }
+  .btn-cancel { padding: 6px 14px; background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.15); border-radius: 8px; color: #f87171; font-size: 0.78rem; font-weight: 600; font-family: inherit; cursor: pointer; }
+  .flash { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 10px; margin-bottom: 16px; font-size: 0.84rem; font-weight: 600; }
+  .flash-error { background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.18); color: #f87171; }
+  .flash-success { background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.18); color: #4ade80; }
+  .flash-info { background: rgba(167,139,250,0.08); border: 1px solid rgba(167,139,250,0.18); color: #a78bfa; }
+  .table-wrap { overflow-x: auto; }
+  .email-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 16px; }
+  .email-table thead th { text-align: left; padding: 12px 10px; font-size: 0.73rem; font-weight: 700; color: #7a7190; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .email-table tbody tr { transition: background 0.15s; }
+  .email-table tbody tr:hover { background: rgba(167,139,250,0.03); }
+  .email-table tbody td { padding: 12px 10px; font-size: 0.82rem; color: #b8aed0; border-bottom: 1px solid rgba(255,255,255,0.03); max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .status-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 20px; font-size: 0.73rem; font-weight: 700; }
+  .status-scheduled { background: rgba(250,204,21,0.1); color: #facc15; border: 1px solid rgba(250,204,21,0.2); }
+  .status-sent { background: rgba(74,222,128,0.1); color: #4ade80; border: 1px solid rgba(74,222,128,0.2); }
+  .status-failed { background: rgba(248,113,113,0.1); color: #f87171; border: 1px solid rgba(248,113,113,0.2); }
+  .status-cancelled { background: rgba(161,161,170,0.1); color: #a1a1aa; border: 1px solid rgba(161,161,170,0.2); }
+  .error-text { font-size: 0.72rem; color: #f87171; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .empty-state { text-align: center; padding: 28px 20px; color: #5a5170; font-size: 0.88rem; }
+  .empty-state i { font-size: 1.8rem; margin-bottom: 10px; display: block; opacity: 0.4; }
+  .footer { text-align: center; margin-top: 40px; padding-bottom: 24px; color: #5a5170; font-size: 0.78rem; }
   .footer a { color: #a78bfa; text-decoration: none; }
-
-  @media (max-width: 480px) {
-    .card { padding: 24px 18px; }
-    .email-table { font-size: 0.78rem; }
-    .email-table thead th, .email-table tbody td { padding: 10px 8px; }
-    .step-line { width: 24px; }
-  }
+  @media (max-width: 480px) { .card { padding: 24px 20px; } .email-table thead th, .email-table tbody td { padding: 10px 6px; font-size: 0.75rem; } .step-line { width: 28px; } }
 </style>
 </head>
 <body>
-
-<div class="orb orb-1"></div>
-<div class="orb orb-2"></div>
-<div class="orb orb-3"></div>
-
 <div class="container">
-
   <div class="header">
-    <a href="/" class="logo">
-      <div class="logo-icon">✉️</div>
-      <span class="logo-text">ColdMail AI</span>
-    </a>
+    <a href="/" class="logo"><div class="logo-icon">✉️</div><span class="logo-text">ColdMail AI</span></a>
   </div>
 
   <div class="progress">
-    <div class="step">
-      <div class="step-circle done">✓</div>
-      <span class="step-label done">Connect</span>
-    </div>
+    <div class="step"><div class="step-num done">✓</div><span class="step-name done">Connect</span></div>
     <div class="step-line done"></div>
-    <div class="step">
-      <div class="step-circle done">✓</div>
-      <span class="step-label done">Generate</span>
-    </div>
+    <div class="step"><div class="step-num done">✓</div><span class="step-name done">Generate</span></div>
     <div class="step-line done"></div>
-    <div class="step">
-      <div class="step-circle active">3</div>
-      <span class="step-label active">Schedule</span>
-    </div>
+    <div class="step"><div class="step-num active">3</div><span class="step-name active">Schedule</span></div>
   </div>
 
-  <!-- Schedule Form -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}{% for category, message in messages %}
+  <div class="flash flash-{{ category }}">
+    {% if category == 'success' %}<i class="fas fa-check-circle"></i>{% elif category == 'error' %}<i class="fas fa-exclamation-circle"></i>{% else %}<i class="fas fa-info-circle"></i>{% endif %}
+    {{ message }}
+  </div>
+  {% endfor %}{% endif %}
+  {% endwith %}
+
   <div class="card">
-    <div class="card-header">
-      <h2><i class="fas fa-paper-plane"></i> Schedule & Send</h2>
-      <p>Review your email and pick the perfect send time</p>
-    </div>
+    <div class="card-title"><i class="fas fa-paper-plane"></i> Schedule & Send</div>
+    <div class="card-desc">Review your email and pick the perfect send time</div>
 
-    <div class="form-group">
-      <label>Recipient Email</label>
-      <input type="email" id="recipientEmail" placeholder="recruiter@company.com">
-    </div>
+    <form method="POST" action="/schedule">
+      <label class="form-label">Recipient Email</label>
+      <input class="form-input" type="email" name="recipient_email" placeholder="recruiter@company.com" required>
 
-    <div class="form-group">
-      <label>Subject</label>
-      <input type="text" id="subject" value="Quick question about the Data Scientist role at Acme Inc">
-    </div>
+      <label class="form-label">Subject</label>
+      <input class="form-input" type="text" name="subject" value="{{ generated_subject }}" required>
 
-    <div class="form-group">
-      <label>Email Body</label>
-      <textarea id="body">Hi Taylor,
+      <label class="form-label">Email Body</label>
+      <textarea class="form-textarea" name="body" required>{{ generated_body }}</textarea>
 
-I came across the Data Scientist opening at Acme Inc and was excited by the team's work on predictive analytics.
+      <label class="form-label">Send At <span>(your local time)</span></label>
+      <input class="form-input" type="datetime-local" name="send_at" required>
 
-In my previous role, I led outbound campaigns that improved conversion by 40% using machine learning models. I'd love to bring that same data-driven approach to your team.
-
-Would you be open to a quick 15-minute chat this week?
-
-Best,
-Priyanka</textarea>
-    </div>
-
-    <div class="form-group">
-      <label>Send At <span style="color:#6b5f80;font-weight:400;">(your local time)</span></label>
-      <input type="datetime-local" id="sendAt">
-    </div>
-
-    <div class="btn-row">
-      <a href="/generate" class="btn-secondary"><i class="fas fa-arrow-left"></i> Back</a>
-      <button class="btn-primary" onclick="scheduleEmail()">
-        <i class="fas fa-clock"></i> Schedule Email
-      </button>
-    </div>
-
-    <div id="status" class="status"></div>
+      <div class="btn-row">
+        <a href="/generate" class="btn-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+        <button type="submit" class="btn-primary"><i class="fas fa-clock"></i> Schedule Email</button>
+      </div>
+    </form>
   </div>
 
-  <!-- Recent scheduled -->
-  <div class="card table-card">
-    <h3><i class="fas fa-list-check"></i> Scheduled Emails</h3>
+  <div class="card">
+    <div class="card-title"><i class="fas fa-list-check"></i> Scheduled Emails</div>
 
-    <table class="email-table" id="emailTable">
-      <thead>
-        <tr>
-          <th>To</th>
-          <th>Subject</th>
-          <th>Send At</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody id="tableBody">
-        <!-- Populated dynamically -->
-      </tbody>
-    </table>
-
-    <div class="empty-state" id="emptyState">
+    {% if jobs %}
+    <div class="table-wrap">
+      <table class="email-table">
+        <thead>
+          <tr>
+            <th>To</th>
+            <th>Subject</th>
+            <th>Send At</th>
+            <th>Status</th>
+            <th>Error</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for job in jobs %}
+          <tr>
+            <td>{{ job.recipient_email }}</td>
+            <td>{{ job.subject }}</td>
+            <td>{{ job.send_at_utc[:16]|replace('T',' ') }} UTC</td>
+            <td><span class="status-badge status-{{ job.status }}">{{ job.status|title }}</span></td>
+            <td class="error-text" title="{{ job.error_message or '' }}">{{ job.error_message or '—' }}</td>
+            <td>
+              {% if job.status == 'scheduled' %}
+              <form method="POST" action="/cancel/{{ job.id }}" style="margin:0;">
+                <button type="submit" class="btn-cancel" title="Cancel"><i class="fas fa-xmark"></i></button>
+              </form>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
       <i class="fas fa-inbox"></i>
-      No scheduled emails yet. Schedule your first one above!
+      No scheduled emails yet
     </div>
+    {% endif %}
   </div>
 
-  <div class="footer">
-    Built by <a href="https://www.linkedin.com/in/priyanka-bhutada/">Priyanka Bhutada</a>
-  </div>
-
+  <div class="footer">Built by <a href="https://www.linkedin.com/in/priyanka-bhutada/">Priyanka Bhutada</a></div>
 </div>
-
-<script>
-// Demo data — in Flask, this would come from your backend
-let emails = [];
-
-function scheduleEmail() {
-  const to = document.getElementById('recipientEmail').value;
-  const subject = document.getElementById('subject').value;
-  const sendAt = document.getElementById('sendAt').value;
-
-  if (!to || !subject || !sendAt) {
-    alert('Please fill in all fields');
-    return;
-  }
-
-  // In Flask, this would POST to /schedule
-  emails.push({ to, subject, sendAt, status: 'pending' });
-  renderTable();
-
-  const status = document.getElementById('status');
-  status.className = 'status success';
-  status.innerHTML = '<i class="fas fa-check-circle"></i> Email scheduled successfully!';
-  status.style.display = 'block';
-
-  document.getElementById('recipientEmail').value = '';
-  document.getElementById('sendAt').value = '';
-
-  setTimeout(() => { status.style.display = 'none'; }, 3000);
-}
-
-function renderTable() {
-  const tbody = document.getElementById('tableBody');
-  const empty = document.getElementById('emptyState');
-
-  if (emails.length === 0) {
-    empty.style.display = 'block';
-    tbody.innerHTML = '';
-    return;
-  }
-
-  empty.style.display = 'none';
-  tbody.innerHTML = emails.map(e => {
-    const date = new Date(e.sendAt);
-    const formatted = date.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true });
-    const statusClass = e.status;
-    return `<tr>
-      <td>${e.to}</td>
-      <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${e.subject}</td>
-      <td>${formatted}</td>
-      <td><span class="status-badge ${statusClass}"><i class="fas fa-circle" style="font-size:6px;"></i> ${e.status}</span></td>
-    </tr>`;
-  }).join('');
-}
-
-renderTable();
-</script>
-
 </body>
 </html>

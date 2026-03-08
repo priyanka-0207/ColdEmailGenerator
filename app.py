@@ -286,12 +286,14 @@ def generate():
         return redirect(url_for("generate_page"))
 
     try:
+        sender_name = request.form.get("sender_name", "").strip()
         subject, body = generate_cold_email(
             resume_context=resume_context,
             target_company=target_company or "the company",
             target_role=target_role or "relevant",
             recipient_name=recipient_name,
             tone=tone,
+            sender_name=sender_name,
         )
 
         session["generated_subject"] = subject
