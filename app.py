@@ -1,12 +1,15 @@
 import os
-import resend
+import smtplib
+from email.message import EmailMessage
 from flask import Flask, render_template, request, jsonify, session
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "dev-change-me")
 
-# Initialize Resend with API key
-resend.api_key = os.getenv("RESEND_API_KEY")
+SMTP_CONFIG = {
+    "gmail": {"server": "smtp.gmail.com", "port": 587},
+    "outlook": {"server": "smtp.office365.com", "port": 587},
+}
 
 
 @app.route("/")
@@ -31,30 +34,48 @@ def schedule_redirect():
 
 @app.route("/api/connect", methods=["POST"])
 def connect():
-    """Save sender email to session (no SMTP verification needed with Resend)."""
+    """Test SMTP connection and save to session."""
     data = request.get_json()
+    provider = (data.get("provider") or "gmail").strip().lower()
     email = (data.get("email") or "").strip()
+    password = (data.get("password") or "").strip()
 
-    if not email:
-        return jsonify({"error": "Email is required"}), 400
+    if not email or not password:
+        return jsonify({"error": "Email and app password are required"}), 400
 
-    # With Resend, we don't need password - just save the sender email
-    # Note: The "from" email must be verified in your Resend dashboard,
-    # OR use Resend's default: "onboarding@resend.dev" for testing
-    session["sender"] = {"email": email}
-    
-    return jsonify({"success": True, "message": f"Connected as {email}"})
+    if provider not in SMTP_CONFIG:
+        return jsonify({"error": "Unsupported provider"}), 400
+
+    cfg = SMTP_CONFIG[provider]
+
+    try:
+        print(f"[DEBUG] Connecting to {cfg['server']}:{cfg['port']}...")
+        with smtplib.SMTP(cfg["server"], cfg["port"], timeout=10) as server:
+            server.starttls()
+            server.login(email, password)
+        print(f"[DEBUG] Connected successfully as {email}")
+
+        session["smtp"] = {
+            "provider": provider,
+            "email": email,
+            "password": password,
+        }
+        return jsonify({"success": True, "message": f"Connected as {email}"})
+
+    except smtplib.SMTPAuthenticationError as e:
+        print(f"[DEBUG] Auth error: {e}")
+        return jsonify({"error": "Authentication failed. Make sure you're using a Gmail App Password, not your regular password."}), 401
+    except Exception as e:
+        print(f"[DEBUG] Connection error: {e}")
+        return jsonify({"error": f"Connection failed: {str(e)}"}), 500
 
 
 @app.route("/api/send", methods=["POST"])
 def send_email():
-    """Send email via Resend API."""
-    sender = session.get("sender")
-    if not sender:
+    """Send email via SMTP."""
+    smtp = session.get("smtp")
+    if not smtp:
         return jsonify({"error": "Not connected. Go back and connect your email first."}), 401
-
-    if not resend.api_key:
-        return jsonify({"error": "RESEND_API_KEY not configured on server"}), 500
 
     data = request.get_json()
     to_email = (data.get("to_email") or "").strip()
@@ -64,43 +85,37 @@ def send_email():
     if not to_email or not subject or not body:
         return jsonify({"error": "Recipient, subject, and body are required"}), 400
 
+    cfg = SMTP_CONFIG[smtp["provider"]]
+
     try:
-        # For testing, use Resend's default sender
-        # For production, verify your domain in Resend dashboard
-        from_email = f"ColdMail <onboarding@resend.dev>"
-        
-        # If you've verified your domain, use:
-        # from_email = f"ColdMail <{sender['email']}>"
+        msg = EmailMessage()
+        msg["From"] = smtp["email"]
+        msg["To"] = to_email
+        msg["Subject"] = subject
+        msg.set_content(body)
 
-        params = {
-            "from": from_email,
-            "to": [to_email],
-            "subject": subject,
-            "text": body,
-            # Optional: add HTML version
-            # "html": f"<p>{body}</p>",
-        }
+        print(f"[DEBUG] Sending email to {to_email}...")
+        with smtplib.SMTP(cfg["server"], cfg["port"], timeout=15) as server:
+            server.starttls()
+            server.login(smtp["email"], smtp["password"])
+            server.send_message(msg)
+        print(f"[DEBUG] Email sent successfully!")
 
-        email_response = resend.Emails.send(params)
-        
-        return jsonify({
-            "success": True, 
-            "message": f"Email sent to {to_email}!",
-            "id": email_response.get("id")
-        })
+        return jsonify({"success": True, "message": f"Email sent to {to_email}!"})
 
-    except resend.exceptions.ResendError as e:
-        return jsonify({"error": f"Resend error: {str(e)}"}), 500
+    except smtplib.SMTPAuthenticationError:
+        return jsonify({"error": "Authentication failed. Reconnect with a valid app password."}), 401
     except Exception as e:
+        print(f"[DEBUG] Send error: {e}")
         return jsonify({"error": f"Failed to send: {str(e)}"}), 500
 
 
 @app.route("/api/status")
 def connection_status():
     """Check if user is connected."""
-    sender = session.get("sender")
-    if sender:
-        return jsonify({"connected": True, "email": sender["email"]})
+    smtp = session.get("smtp")
+    if smtp:
+        return jsonify({"connected": True, "email": smtp["email"], "provider": smtp["provider"]})
     return jsonify({"connected": False})
 
 
