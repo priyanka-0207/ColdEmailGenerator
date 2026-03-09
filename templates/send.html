@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Send - ColdMail AI</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{min-height:100vh;background:#12101f;background-image:radial-gradient(ellipse at 20% 0%,rgba(120,80,200,.12) 0%,transparent 60%),radial-gradient(ellipse at 80% 100%,rgba(100,60,180,.10) 0%,transparent 60%);font-family:'Segoe UI',system-ui,sans-serif;color:#e0d7f5;display:flex;flex-direction:column;align-items:center}
+.ct{width:100%;max-width:640px;padding:24px 16px}
+.hd{text-align:center;margin:28px 0}
+.logo{display:inline-flex;align-items:center;gap:12px;text-decoration:none}
+.logo i{width:42px;height:42px;background:linear-gradient(135deg,#a78bfa,#7c5cbf);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;font-style:normal}
+.logo b{font-size:1.55rem;font-weight:800;color:#e0d7f5}
+.cd{background:rgba(255,255,255,.035);border:1px solid rgba(167,139,250,.12);border-radius:18px;padding:28px 24px;margin-bottom:18px}
+.ct2{font-size:1.15rem;font-weight:700;color:#e0d7f5;display:flex;align-items:center;gap:10px;margin-bottom:5px}
+.ct2 i{color:#a78bfa}
+.cd2{color:#7a7190;font-size:.83rem;margin-bottom:20px}
+.fl{display:block;font-size:.82rem;font-weight:600;color:#b0a3c8;margin-bottom:7px}
+.fl span{color:#6b5f80;font-weight:400}
+.fi,.ft2{width:100%;padding:11px 14px;background:rgba(255,255,255,.05);border:1px solid rgba(167,139,250,.14);border-radius:10px;color:#e0d7f5;font-size:.88rem;font-family:inherit;outline:none;transition:border-color .2s;margin-bottom:16px}
+.fi:focus,.ft2:focus{border-color:rgba(167,139,250,.45);box-shadow:0 0 0 3px rgba(167,139,250,.08)}
+.fi::placeholder,.ft2::placeholder{color:#5a5170}
+.ft2{resize:vertical;min-height:160px;line-height:1.7}
+input[type="datetime-local"]{color-scheme:dark}
+.rw{display:flex;gap:10px;margin-top:4px;flex-wrap:wrap}
+.bp{flex:1;padding:14px;background:linear-gradient(135deg,#a78bfa,#7c5cbf);border:none;border-radius:12px;color:#fff;font-size:.93rem;font-weight:700;font-family:inherit;cursor:pointer;transition:transform .15s,box-shadow .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.bp:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(167,139,250,.3)}
+.bp:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.bk{padding:14px 18px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;color:#a097b8;font-size:.88rem;font-weight:600;font-family:inherit;cursor:pointer;text-decoration:none;display:flex;align-items:center;gap:8px;transition:all .2s}
+.bk:hover{border-color:rgba(167,139,250,.25);color:#c9a4f5}
+.bs2{width:100%;padding:14px;background:linear-gradient(135deg,#d97706,#b45309);border:none;border-radius:12px;color:#fff;font-size:.93rem;font-weight:700;font-family:inherit;cursor:pointer;transition:transform .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.bs2:hover{transform:translateY(-1px)}
+.bs2:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.sp{width:17px;height:17px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.nt{display:none;padding:12px 16px;border-radius:10px;margin-bottom:14px;font-size:.84rem;font-weight:600;align-items:center;gap:8px}
+.nt.show{display:flex}
+.nt-ok{background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.18);color:#4ade80}
+.nt-err{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.18);color:#f87171}
+.nt-warn{background:rgba(250,204,21,.08);border:1px solid rgba(250,204,21,.18);color:#facc15}
+.nocon{padding:20px;text-align:center;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.12);border-radius:12px;margin-bottom:16px}
+.nocon p{color:#f87171;font-size:.88rem;font-weight:600;margin-bottom:10px}
+.nocon a{padding:10px 20px;background:linear-gradient(135deg,#a78bfa,#7c5cbf);border-radius:10px;color:#fff;font-size:.85rem;font-weight:700;text-decoration:none}
+.pvb{background:rgba(167,139,250,.04);border:1px solid rgba(167,139,250,.1);border-radius:12px;padding:18px;margin-bottom:18px}
+.pvb h4{font-size:.78rem;font-weight:700;color:#a78bfa;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.pvb .sub{font-size:.9rem;font-weight:700;color:#d4c4f0;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.06)}
+.pvb .bod{font-size:.84rem;color:#b8aed0;line-height:1.7;white-space:pre-wrap}
+.sch-box{margin-top:16px;padding:18px;background:rgba(250,204,21,.04);border:1px solid rgba(250,204,21,.1);border-radius:12px}
+.sch-title{font-size:.85rem;font-weight:700;color:#facc15;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.sch-item{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;margin-top:8px;background:rgba(255,255,255,.03);border-radius:8px;font-size:.8rem}
+.sent-item{background:rgba(255,255,255,.03);border:1px solid rgba(167,139,250,.08);border-radius:12px;padding:14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.sent-info{flex:1;min-width:0}
+.sent-to{font-size:.84rem;font-weight:700;color:#d4c4f0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sent-sub{font-size:.76rem;color:#7a7190;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sent-ok{padding:4px 10px;border-radius:14px;font-size:.74rem;font-weight:700;background:rgba(74,222,128,.1);color:#4ade80;border:1px solid rgba(74,222,128,.2)}
+.sent-fail{padding:4px 10px;border-radius:14px;font-size:.74rem;font-weight:700;background:rgba(248,113,113,.1);color:#f87171;border:1px solid rgba(248,113,113,.2)}
+.empty{text-align:center;padding:24px;color:#5a5170;font-size:.86rem}
+.empty i{font-size:1.6rem;margin-bottom:8px;display:block;opacity:.4}
+.ft3{text-align:center;margin-top:36px;padding-bottom:24px;color:#5a5170;font-size:.76rem}
+.ft3 a{color:#a78bfa;text-decoration:none}
+@media(max-width:480px){.cd{padding:22px 18px}.rw{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="ct">
+<div class="hd"><a href="/" class="logo"><i>✉️</i><b>ColdMail AI</b></a></div>
+
+<div class="cd">
+<div class="ct2"><i class="fas fa-paper-plane"></i> Send Email</div>
+<div class="cd2">Send your generated email directly via your connected Gmail/Outlook</div>
+
+<div class="nt" id="notif"></div>
+<div class="nocon" id="nocon" style="display:none">
+<p><i class="fas fa-exclamation-triangle"></i> Email not connected</p>
+<a href="/"><i class="fas fa-plug"></i> Connect Email First</a>
+</div>
+
+<div id="formArea">
+<label class="fl">Recipient Email</label>
+<input class="fi" type="email" id="toEmail" placeholder="recruiter@company.com">
+
+<label class="fl">Subject</label>
+<input class="fi" type="text" id="subj">
+
+<label class="fl">Email Body</label>
+<textarea class="ft2" id="body"></textarea>
+
+<div class="pvb" id="pvBox" style="display:none">
+<h4>Preview</h4>
+<div class="sub" id="pvSub"></div>
+<div class="bod" id="pvBod"></div>
+</div>
+
+<div class="rw">
+<a href="/generate" class="bk"><i class="fas fa-arrow-left"></i> Back</a>
+<button class="bp" id="sendBtn" onclick="sendNow()"><i class="fas fa-paper-plane"></i> Send Now</button>
+</div>
+
+<!-- Schedule -->
+<div class="sch-box">
+<div class="sch-title"><i class="fas fa-clock"></i> Schedule for Later</div>
+<label class="fl">Send At <span>(your local time)</span></label>
+<input class="fi" type="datetime-local" id="schTime">
+<button class="bs2" id="schBtn" onclick="scheduleSend()"><i class="fas fa-clock"></i> Schedule Send</button>
+<div id="schList"></div>
+</div>
+</div>
+</div>
+
+<!-- Sent History -->
+<div class="cd">
+<div class="ct2"><i class="fas fa-list-check"></i> Sent Emails</div>
+<div id="sentList">
+<div class="empty" id="emptyState"><i class="fas fa-inbox"></i>No emails sent yet</div>
+</div>
+</div>
+
+<div class="ft3">Built with RAG + Multi-LLM by <a href="https://www.linkedin.com/in/priyanka-bhutada/">Priyanka Bhutada</a></div>
+</div>
+
+<script>
+var sentEmails=[];
+var scheduled=[];
+
+// Read URL params
+var params=new URLSearchParams(window.location.search);
+if(params.get('to'))document.getElementById('toEmail').value=params.get('to');
+if(params.get('subject'))document.getElementById('subj').value=params.get('subject');
+if(params.get('body'))document.getElementById('body').value=params.get('body');
+
+// Check connection
+fetch('/api/status').then(function(r){return r.json()}).then(function(d){
+  if(!d.connected){
+    document.getElementById('nocon').style.display='block';
+    document.getElementById('formArea').style.display='none';
+  }
+}).catch(function(){});
+
+// Update preview on input
+['toEmail','subj','body'].forEach(function(id){
+  document.getElementById(id).addEventListener('input',updatePv);
+});
+updatePv();
+
+function updatePv(){
+  var sub=document.getElementById('subj').value.trim();
+  var body=document.getElementById('body').value.trim();
+  var box=document.getElementById('pvBox');
+  if(sub||body){
+    box.style.display='block';
+    document.getElementById('pvSub').textContent=sub;
+    document.getElementById('pvBod').textContent=body;
+  }else{box.style.display='none'}
+}
+
+function notify(msg,type){
+  var n=document.getElementById('notif');
+  if(!n)return;
+  n.className='nt show nt-'+type;
+  var icon=type==='ok'?'check-circle':type==='err'?'exclamation-circle':'bell';
+  n.innerHTML='<i class="fas fa-'+icon+'"></i> '+msg;
+  if(type==='ok')setTimeout(function(){n.classList.remove('show')},5000);
+}
+
+function sendNow(){
+  var to=document.getElementById('toEmail').value.trim();
+  var sub=document.getElementById('subj').value.trim();
+  var body=document.getElementById('body').value.trim();
+  if(!to||!sub||!body){notify('Please fill in all fields','warn');return}
+
+  var btn=document.getElementById('sendBtn');
+  btn.disabled=true;
+  btn.innerHTML='<span class="sp"></span> Sending...';
+
+  doSend(to,sub,body,function(ok,msg){
+    btn.disabled=false;
+    btn.innerHTML='<i class="fas fa-paper-plane"></i> Send Now';
+    if(ok){
+      notify('Email sent to '+to+' successfully!','ok');
+      sentEmails.push({to:to,subject:sub,time:new Date().toLocaleString(),status:'sent'});
+    }else{
+      notify(msg||'Failed to send','err');
+      sentEmails.push({to:to,subject:sub,time:new Date().toLocaleString(),status:'failed'});
+    }
+    renderSent();
+  });
+}
+
+function scheduleSend(){
+  var to=document.getElementById('toEmail').value.trim();
+  var sub=document.getElementById('subj').value.trim();
+  var body=document.getElementById('body').value.trim();
+  var time=document.getElementById('schTime').value;
+  if(!to||!sub||!body){notify('Please fill in all email fields','warn');return}
+  if(!time){notify('Please pick a send time','warn');return}
+
+  var sendAt=new Date(time);
+  if(sendAt<=new Date()){notify('Please pick a future time','warn');return}
+
+  var delay=sendAt.getTime()-Date.now();
+  if(delay>604800000){notify('Max 7 days ahead','warn');return}
+
+  var idx=scheduled.length;
+  scheduled.push({to:to,subject:sub,time:sendAt.toLocaleString(),status:'pending'});
+  renderScheduled();
+
+  var btn=document.getElementById('schBtn');
+  btn.disabled=true;
+  btn.innerHTML='<span class="sp"></span> Scheduling...';
+
+  setTimeout(function(){
+    btn.disabled=false;
+    btn.innerHTML='<i class="fas fa-clock"></i> Schedule Send';
+  },1000);
+
+  // Auto-send at scheduled time
+  setTimeout(function(){
+    doSend(to,sub,body,function(ok,msg){
+      if(scheduled[idx])scheduled[idx].status=ok?'sent':'failed';
+      renderScheduled();
+      if(ok){
+        notify('Scheduled email to '+to+' sent!','ok');
+        sentEmails.push({to:to,subject:sub,time:new Date().toLocaleString(),status:'sent'});
+      }else{
+        notify('Scheduled send failed: '+msg,'err');
+        sentEmails.push({to:to,subject:sub,time:new Date().toLocaleString(),status:'failed'});
+      }
+      renderSent();
+    });
+  },delay);
+
+  notify('Scheduled! Will auto-send at '+sendAt.toLocaleString()+'. Keep this tab open.','ok');
+  document.getElementById('schTime').value='';
+}
+
+function doSend(to,sub,body,callback){
+  fetch('/api/send',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({to_email:to,subject:sub,body:body})
+  }).then(function(r){return r.json().then(function(d){return{ok:r.ok,data:d}})})
+  .then(function(res){
+    if(res.ok&&res.data.success){callback(true,res.data.message)}
+    else{callback(false,res.data.error||'Unknown error')}
+  }).catch(function(e){callback(false,e.message)});
+}
+
+function renderSent(){
+  var el=document.getElementById('sentList');
+  var empty=document.getElementById('emptyState');
+  if(!el)return;
+  if(sentEmails.length===0){if(empty)empty.style.display='block';return}
+  if(empty)empty.style.display='none';
+  var h='';
+  for(var i=sentEmails.length-1;i>=0;i--){
+    var s=sentEmails[i];
+    h+='<div class="sent-item"><div class="sent-info"><div class="sent-to">'+s.to+'</div><div class="sent-sub">'+s.subject+' \u00b7 '+s.time+'</div></div><span class="'+(s.status==='sent'?'sent-ok':'sent-fail')+'">'+(s.status==='sent'?'\u2713 Sent':'\u2717 Failed')+'</span></div>';
+  }
+  el.innerHTML=h;
+}
+
+function renderScheduled(){
+  var el=document.getElementById('schList');
+  if(!el)return;
+  if(scheduled.length===0){el.innerHTML='';return}
+  var h='';
+  for(var i=scheduled.length-1;i>=0;i--){
+    var s=scheduled[i];
+    var col=s.status==='sent'?'#4ade80':s.status==='failed'?'#f87171':'#facc15';
+    var icon=s.status==='sent'?'check-circle':s.status==='failed'?'times-circle':'clock';
+    var label=s.status==='sent'?'Sent':s.status==='failed'?'Failed':'Pending';
+    h+='<div class="sch-item"><div style="color:#b8aed0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">'+s.to+' \u00b7 '+s.time+'</div><span style="color:'+col+';font-weight:700;font-size:.74rem;display:flex;align-items:center;gap:4px"><i class="fas fa-'+icon+'"></i> '+label+'</span></div>';
+  }
+  el.innerHTML=h;
+}
+
+renderSent();
+renderScheduled();
+</script>
+</body>
+</html>

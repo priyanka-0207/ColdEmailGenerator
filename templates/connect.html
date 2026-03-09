@@ -6,152 +6,153 @@
 <title>ColdMail AI</title>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    min-height: 100vh;
-    background: #12101f;
-    background-image:
-      radial-gradient(ellipse at 20% 0%, rgba(120,80,200,0.12) 0%, transparent 60%),
-      radial-gradient(ellipse at 80% 100%, rgba(100,60,180,0.10) 0%, transparent 60%);
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    color: #e0d7f5;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  .container { width: 100%; max-width: 600px; padding: 24px 16px; }
-  .header { text-align: center; margin: 36px 0 32px; }
-  .logo { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; }
-  .logo-icon { width: 42px; height: 42px; background: linear-gradient(135deg, #a78bfa, #7c5cbf); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-  .logo-text { font-size: 1.55rem; font-weight: 800; color: #e0d7f5; letter-spacing: -0.3px; }
-  .progress { display: flex; align-items: center; justify-content: center; margin-bottom: 32px; gap: 0; }
-  .step { display: flex; align-items: center; gap: 8px; }
-  .step-num { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; }
-  .step-num.active { background: linear-gradient(135deg, #a78bfa, #7c5cbf); color: #fff; box-shadow: 0 0 16px rgba(167,139,250,0.35); }
-  .step-num.inactive { background: rgba(255,255,255,0.06); color: #6b5f80; }
-  .step-name { font-size: 0.82rem; font-weight: 600; }
-  .step-name.active { color: #c9a4f5; }
-  .step-name.inactive { color: #6b5f80; }
-  .step-line { width: 48px; height: 2px; margin: 0 10px; border-radius: 2px; }
-  .step-line.inactive { background: rgba(255,255,255,0.08); }
-  .card { background: rgba(255,255,255,0.035); border: 1px solid rgba(167,139,250,0.12); border-radius: 18px; padding: 32px 28px; }
-  .card-title { font-size: 1.2rem; font-weight: 700; color: #e0d7f5; display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
-  .card-title i { color: #a78bfa; font-size: 1rem; }
-  .card-desc { color: #7a7190; font-size: 0.85rem; margin-bottom: 26px; }
-  .form-label { display: block; font-size: 0.84rem; font-weight: 600; color: #b0a3c8; margin-bottom: 8px; }
-  .form-input { width: 100%; padding: 12px 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(167,139,250,0.14); border-radius: 10px; color: #e0d7f5; font-size: 0.9rem; font-family: inherit; outline: none; transition: border-color 0.2s, box-shadow 0.2s; margin-bottom: 20px; }
-  .form-input:focus { border-color: rgba(167,139,250,0.45); box-shadow: 0 0 0 3px rgba(167,139,250,0.08); }
-  .form-input::placeholder { color: #5a5170; }
-  .provider-row { display: flex; gap: 12px; margin-bottom: 22px; }
-  .provider-chip { flex: 1; padding: 14px 0; border-radius: 12px; border: 1px solid rgba(255,255,255,0.07); background: rgba(255,255,255,0.03); color: #7a7190; font-size: 0.9rem; font-weight: 600; font-family: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.2s; }
-  .provider-chip:hover { border-color: rgba(167,139,250,0.2); background: rgba(167,139,250,0.04); }
-  .provider-chip.selected { border-color: rgba(167,139,250,0.4); background: rgba(167,139,250,0.1); color: #c9a4f5; box-shadow: 0 0 14px rgba(167,139,250,0.08); }
-  .provider-chip i { font-size: 1.15rem; }
-  .btn-primary { width: 100%; padding: 14px; background: linear-gradient(135deg, #a78bfa, #7c5cbf); border: none; border-radius: 12px; color: #fff; font-size: 0.95rem; font-weight: 700; font-family: inherit; cursor: pointer; transition: transform 0.15s, box-shadow 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
-  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(167,139,250,0.3); }
-  .btn-primary:active { transform: translateY(0); }
-  .error-msg { display: none; text-align: center; padding: 10px; border-radius: 10px; margin-top: 14px; font-size: 0.84rem; font-weight: 600; background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.18); color: #f87171; }
-  .error-msg.show { display: block; }
-  .success-msg { display: none; text-align: center; padding: 10px; border-radius: 10px; margin-top: 14px; font-size: 0.84rem; font-weight: 600; background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.18); color: #4ade80; }
-  .success-msg.show { display: flex; align-items: center; justify-content: center; gap: 8px; }
-  .help-box { margin-top: 22px; padding: 14px 16px; background: rgba(167,139,250,0.04); border: 1px solid rgba(167,139,250,0.08); border-radius: 10px; font-size: 0.82rem; color: #7a7190; line-height: 1.7; text-align: center; }
-  .help-box a { color: #a78bfa; text-decoration: none; font-weight: 600; }
-  .help-box a:hover { text-decoration: underline; }
-  .footer { text-align: center; margin-top: 40px; padding-bottom: 28px; font-size: 0.78rem; color: #5a5170; }
-  .footer a { color: #a78bfa; text-decoration: none; }
-  @media (max-width: 480px) { .card { padding: 24px 20px; } .logo-text { font-size: 1.3rem; } .step-line { width: 28px; } .step-name { font-size: 0.74rem; } }
+*{margin:0;padding:0;box-sizing:border-box}
+body{min-height:100vh;background:#12101f;background-image:radial-gradient(ellipse at 20% 0%,rgba(120,80,200,.12) 0%,transparent 60%),radial-gradient(ellipse at 80% 100%,rgba(100,60,180,.10) 0%,transparent 60%);font-family:'Segoe UI',system-ui,sans-serif;color:#e0d7f5;display:flex;flex-direction:column;align-items:center}
+.ct{width:100%;max-width:600px;padding:24px 16px}
+.hero{text-align:center;margin:36px 0 28px}
+.logo{display:inline-flex;align-items:center;gap:12px;text-decoration:none;margin-bottom:20px}
+.logo i{width:48px;height:48px;background:linear-gradient(135deg,#a78bfa,#7c5cbf);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;font-style:normal}
+.logo b{font-size:1.7rem;font-weight:800;color:#e0d7f5}
+.hero h1{font-size:1.8rem;font-weight:800;color:#fff;line-height:1.3;margin-bottom:10px}
+.hero h1 span{background:linear-gradient(90deg,#a78bfa,#c9a4f5);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{color:#7a7190;font-size:.95rem;line-height:1.6}
+.cd{background:rgba(255,255,255,.035);border:1px solid rgba(167,139,250,.12);border-radius:18px;padding:28px 24px;margin-bottom:18px}
+.ct2{font-size:1.15rem;font-weight:700;color:#e0d7f5;display:flex;align-items:center;gap:10px;margin-bottom:5px}
+.ct2 i{color:#a78bfa}
+.cd2{color:#7a7190;font-size:.83rem;margin-bottom:20px}
+.fl{display:block;font-size:.82rem;font-weight:600;color:#b0a3c8;margin-bottom:7px}
+.fi{width:100%;padding:11px 14px;background:rgba(255,255,255,.05);border:1px solid rgba(167,139,250,.14);border-radius:10px;color:#e0d7f5;font-size:.88rem;font-family:inherit;outline:none;transition:border-color .2s;margin-bottom:16px}
+.fi:focus{border-color:rgba(167,139,250,.45);box-shadow:0 0 0 3px rgba(167,139,250,.08)}
+.fi::placeholder{color:#5a5170}
+.pr{display:flex;gap:12px;margin-bottom:18px}
+.pc{flex:1;padding:14px 0;border-radius:12px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.03);color:#7a7190;font-size:.9rem;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s}
+.pc:hover{border-color:rgba(167,139,250,.2)}
+.pc.on{border-color:rgba(167,139,250,.4);background:rgba(167,139,250,.1);color:#c9a4f5}
+.bp{width:100%;padding:14px;background:linear-gradient(135deg,#a78bfa,#7c5cbf);border:none;border-radius:12px;color:#fff;font-size:.95rem;font-weight:700;font-family:inherit;cursor:pointer;transition:transform .15s,box-shadow .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.bp:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(167,139,250,.3)}
+.bp:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.sp{width:17px;height:17px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.nt{display:none;padding:12px 16px;border-radius:10px;margin-bottom:14px;font-size:.84rem;font-weight:600;align-items:center;gap:8px}
+.nt.show{display:flex}
+.nt-ok{background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.18);color:#4ade80}
+.nt-err{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.18);color:#f87171}
+.con{display:none;padding:12px 16px;background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.15);border-radius:10px;margin-bottom:16px;font-size:.84rem;color:#4ade80;font-weight:600;align-items:center;justify-content:space-between}
+.con.show{display:flex}
+.con .info{display:flex;align-items:center;gap:8px}
+.help{margin-top:18px;padding:16px;background:rgba(167,139,250,.04);border:1px solid rgba(167,139,250,.08);border-radius:12px;font-size:.8rem;color:#7a7190;line-height:1.7}
+.help a{color:#a78bfa;text-decoration:none;font-weight:600}
+.help ol{margin:10px 0 0 18px}
+.help li{margin-bottom:6px}
+.ft{text-align:center;margin-top:36px;padding-bottom:28px;font-size:.78rem;color:#5a5170}
+.ft a{color:#a78bfa;text-decoration:none}
+@media(max-width:480px){.cd{padding:22px 18px}.hero h1{font-size:1.4rem}}
 </style>
 </head>
 <body>
-
-<div class="container">
-
-  <!-- Header -->
-  <div class="header">
-    <a href="/" class="logo">
-      <div class="logo-icon">✉️</div>
-      <span class="logo-text">ColdMail AI</span>
-    </a>
+<div class="ct">
+  <div class="hero">
+    <a href="/" class="logo"><i>✉️</i><b>ColdMail AI</b></a>
+    <h1>Generate & send <span>cold emails</span> that get replies</h1>
+    <p>Connect your Gmail, generate personalized emails, and send them directly — all in one place.</p>
   </div>
 
-  <!-- Progress -->
-  <div class="progress">
-    <div class="step">
-      <div class="step-num active">1</div>
-      <span class="step-name active">Connect</span>
-    </div>
-    <div class="step-line inactive"></div>
-    <div class="step">
-      <div class="step-num inactive">2</div>
-      <span class="step-name inactive">Generate</span>
-    </div>
-    <div class="step-line inactive"></div>
-    <div class="step">
-      <div class="step-num inactive">3</div>
-      <span class="step-name inactive">Schedule</span>
-    </div>
-  </div>
+  <div class="cd">
+    <div class="ct2"><i class="fas fa-plug"></i> Connect Your Email</div>
+    <div class="cd2">Connect once, then generate and send unlimited emails</div>
 
-  <!-- Card -->
-  <div class="card">
-    <div class="card-title"><i class="fas fa-plug"></i> Connect Your Email</div>
-    <div class="card-desc">Use an app password so you can send for free via SMTP</div>
-
-    <!-- Provider chips -->
-    <label class="form-label">Provider</label>
-    <div class="provider-row">
-      <button type="button" class="provider-chip selected" onclick="pickProvider(this,'gmail')">
-        <i class="fab fa-google"></i> Gmail
-      </button>
-      <button type="button" class="provider-chip" onclick="pickProvider(this,'outlook')">
-        <i class="fab fa-microsoft"></i> Outlook
-      </button>
+    <div class="nt" id="notif"></div>
+    <div class="con" id="conStatus">
+      <div class="info"><i class="fas fa-check-circle"></i> <span id="conText"></span></div>
+      <a href="/generate" style="padding:7px 16px;background:linear-gradient(135deg,#a78bfa,#7c5cbf);border-radius:8px;color:#fff;font-size:.8rem;font-weight:700;text-decoration:none">Generate Email →</a>
     </div>
 
-    <!-- Form -->
-    <form method="POST" action="/connect">
-      <input type="hidden" name="provider" id="providerInput" value="gmail">
+    <label class="fl">Provider</label>
+    <div class="pr">
+      <button type="button" class="pc on" onclick="pickP(this,'gmail')"><i class="fab fa-google"></i> Gmail</button>
+      <button type="button" class="pc" onclick="pickP(this,'outlook')"><i class="fab fa-microsoft"></i> Outlook</button>
+    </div>
 
-      <label class="form-label">Sender Email</label>
-      <input class="form-input" type="email" name="sender_email" placeholder="you@example.com" required>
+    <label class="fl">Your Email</label>
+    <input class="fi" type="email" id="email" placeholder="you@gmail.com">
 
-      <label class="form-label">App Password</label>
-      <input class="form-input" type="password" name="sender_password" placeholder="Enter your app password" required>
+    <label class="fl">App Password <span style="color:#6b5f80;font-weight:400">(not your regular password)</span></label>
+    <input class="fi" type="password" id="pass" placeholder="16-character app password">
 
-      <button type="submit" class="btn-primary">
-        Connect and continue <i class="fas fa-arrow-right"></i>
-      </button>
-    </form>
+    <button class="bp" id="conBtn" onclick="connect()"><i class="fas fa-link"></i> Connect & Verify</button>
 
-    <!-- Flash messages (only visible when running through Flask) -->
-    {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}{% for category, message in messages %}
-    {% if category == 'error' %}
-    <div class="error-msg show">{{ message }}</div>
-    {% else %}
-    <div class="success-msg show"><i class="fas fa-check-circle"></i> {{ message }}</div>
-    {% endif %}
-    {% endfor %}{% endif %}{% endwith %}
-
-    <div class="help-box">
-      <a href="https://support.google.com/accounts/answer/185833" target="_blank">Gmail app password guide →</a>
-      &nbsp;&nbsp;|&nbsp;&nbsp;
-      <a href="https://support.microsoft.com/en-us/account-billing/how-to-get-and-use-app-passwords-5896ed9b-4263-e681-128a-a6f2979a7944" target="_blank">Outlook app password guide →</a>
+    <div class="help">
+      <strong>How to get a Gmail App Password (2 minutes):</strong>
+      <ol>
+        <li>Go to <a href="https://myaccount.google.com/security" target="_blank">Google Account → Security</a></li>
+        <li>Enable <strong>2-Step Verification</strong> (if not already on)</li>
+        <li>Go to <a href="https://myaccount.google.com/apppasswords" target="_blank">App Passwords</a></li>
+        <li>Type <code>ColdMail</code> → click <strong>Create</strong></li>
+        <li>Copy the <strong>16-character password</strong> and paste it above</li>
+      </ol>
+      <p style="margin-top:10px"><a href="https://support.microsoft.com/en-us/account-billing/how-to-get-and-use-app-passwords-5896ed9b-4263-e681-128a-a6f2979a7944" target="_blank">Outlook app password guide →</a></p>
     </div>
   </div>
 
-  <div class="footer">
-    Built by <a href="https://www.linkedin.com/in/priyanka-bhutada/">Priyanka Bhutada</a>
-  </div>
-
+  <div class="ft">Built by <a href="https://www.linkedin.com/in/priyanka-bhutada/">Priyanka Bhutada</a></div>
 </div>
 
 <script>
-function pickProvider(el, val) {
-  document.querySelectorAll('.provider-chip').forEach(c => c.classList.remove('selected'));
-  el.classList.add('selected');
-  document.getElementById('providerInput').value = val;
+var provider='gmail';
+
+function pickP(el,v){
+  document.querySelectorAll('.pc').forEach(function(c){c.classList.remove('on')});
+  el.classList.add('on');
+  provider=v;
+}
+
+function notify(msg,type){
+  var n=document.getElementById('notif');
+  if(!n)return;
+  n.className='nt show nt-'+type;
+  var icon=type==='ok'?'check-circle':'exclamation-circle';
+  n.innerHTML='<i class="fas fa-'+icon+'"></i> '+msg;
+}
+
+// Check if already connected
+fetch('/api/status').then(function(r){return r.json()}).then(function(d){
+  if(d.connected){
+    document.getElementById('conStatus').classList.add('show');
+    document.getElementById('conText').textContent='Connected: '+d.provider.charAt(0).toUpperCase()+d.provider.slice(1)+' ('+d.email+')';
+  }
+}).catch(function(){});
+
+function connect(){
+  var email=document.getElementById('email').value.trim();
+  var pass=document.getElementById('pass').value.trim();
+  if(!email||!pass){notify('Please enter your email and app password','err');return}
+
+  var btn=document.getElementById('conBtn');
+  btn.disabled=true;
+  btn.innerHTML='<span class="sp"></span> Verifying...';
+
+  fetch('/api/connect',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({provider:provider,email:email,password:pass})
+  }).then(function(r){return r.json().then(function(d){return{ok:r.ok,data:d}})})
+  .then(function(res){
+    btn.disabled=false;
+    btn.innerHTML='<i class="fas fa-link"></i> Connect & Verify';
+    if(res.ok&&res.data.success){
+      notify('Connected! Redirecting to generate...','ok');
+      document.getElementById('conStatus').classList.add('show');
+      document.getElementById('conText').textContent='Connected: '+provider.charAt(0).toUpperCase()+provider.slice(1)+' ('+email+')';
+      setTimeout(function(){window.location.href='/generate'},1500);
+    }else{
+      notify(res.data.error||'Connection failed','err');
+    }
+  }).catch(function(e){
+    btn.disabled=false;
+    btn.innerHTML='<i class="fas fa-link"></i> Connect & Verify';
+    notify('Network error: '+e.message,'err');
+  });
 }
 </script>
-
 </body>
 </html>
