@@ -1,6 +1,6 @@
 # ColdEmailGenerator
 
-A small side project built to help job-seekers with practical outreach workflows:
+A Flask app for job-seekers to:
 
 1. sign in with Gmail or Outlook using OAuth 2.0,
 2. generate personalized cold emails,
@@ -8,8 +8,6 @@ A small side project built to help job-seekers with practical outreach workflows
 4. track open rates in a dashboard,
 5. index/retrieve resume context with a lightweight vector-style retrieval layer,
 6. optionally connect LinkedIn for social posting workflows.
-
-Maintained by Priyanka Bhutada.
 
 ## Run locally
 

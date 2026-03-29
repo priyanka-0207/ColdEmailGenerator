@@ -21,8 +21,4 @@ instance/
 # Tooling caches
 .pytest_cache/
 
-# IDEs and OS-specific files
-.vscode/
-.idea/
-.DS_Store
-Thumbs.db
+analytics.db
