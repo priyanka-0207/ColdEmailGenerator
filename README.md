@@ -1,10 +1,13 @@
 # ColdEmailGenerator
 
-A simple Flask app that helps job-seekers:
+A Flask app for job-seekers to:
 
-1. connect a Gmail or Outlook account for free (using app passwords),
-2. generate a cold email from resume context,
-3. schedule the email to send later.
+1. sign in with Gmail or Outlook using OAuth 2.0,
+2. generate personalized cold emails,
+3. send emails via provider SMTP using XOAUTH2,
+4. track open rates in a dashboard,
+5. index/retrieve resume context with a lightweight vector-style retrieval layer,
+6. optionally connect LinkedIn for social posting workflows.
 
 ## Run locally
 
@@ -17,15 +20,49 @@ python app.py
 
 Open http://localhost:5000.
 
-## Notes
+## OAuth setup
 
-- Gmail and Outlook sending uses SMTP + app passwords (free tiers).
-- Scheduled jobs are stored in `scheduler.db` (SQLite).
-- This is a starter project; do not deploy with the default `secret_key`.
+```bash
+export SECRET_KEY="replace-with-a-long-random-value"
+export OAUTH_CALLBACK_URL="http://localhost:5000/api/oauth/callback"
+export TRACKING_BASE_URL="http://localhost:5000"
+
+# Google OAuth app
+export GOOGLE_CLIENT_ID="..."
+export GOOGLE_CLIENT_SECRET="..."
+
+# Microsoft OAuth app
+export MICROSOFT_CLIENT_ID="..."
+export MICROSOFT_CLIENT_SECRET="..."
+
+# LinkedIn OAuth app
+export LINKEDIN_CLIENT_ID="..."
+export LINKEDIN_CLIENT_SECRET="..."
+export LINKEDIN_CALLBACK_URL="http://localhost:5000/api/linkedin/callback"
+# Needed only if publishing posts
+export LINKEDIN_MEMBER_URN="urn:li:person:..."
+```
+
+## New APIs
+
+- `GET /api/linkedin/auth/start`
+- `GET /api/linkedin/callback`
+- `GET /api/linkedin/status`
+- `POST /api/linkedin/post`
+- `POST /api/context/index`
+- `POST /api/context/retrieve`
+- `GET /api/dashboard/open-rates`
+- `GET /dashboard`
+
+## Security notes
+
+- Authentication uses OAuth 2.0 (no app passwords collected).
+- Session cookies are `HttpOnly`, `SameSite=Lax`, secure by default.
+- Tokens are stored server-side in memory and refreshed on expiry.
+- Open tracking uses a 1x1 pixel endpoint and local SQLite analytics.
 
 ## Test
 
 ```bash
-pip install pytest
 pytest
 ```

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Email Open Dashboard</title>
+<style>
+body{font-family:Segoe UI,system-ui,sans-serif;background:#111827;color:#e5e7eb;margin:0;padding:24px}
+.card{max-width:980px;margin:0 auto;background:#1f2937;border:1px solid #374151;border-radius:12px;padding:20px}
+.stats{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px}.stat{background:#111827;border:1px solid #374151;border-radius:10px;padding:12px 14px;min-width:140px}
+table{width:100%;border-collapse:collapse}th,td{padding:10px;border-bottom:1px solid #374151;text-align:left;font-size:.9rem}
+.badge{padding:3px 8px;border-radius:999px;background:#065f46;color:#a7f3d0;font-size:.75rem}
+</style>
+</head>
+<body>
+<div class="card">
+  <h2>Email Open Rates</h2>
+  <div class="stats">
+    <div class="stat"><div>Sent</div><strong id="sent">0</strong></div>
+    <div class="stat"><div>Opened</div><strong id="opened">0</strong></div>
+    <div class="stat"><div>Open Rate</div><strong id="rate">0%</strong></div>
+  </div>
+  <table>
+    <thead><tr><th>Recipient</th><th>Subject</th><th>Opens</th><th>Last Open</th></tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+</div>
+<script>
+fetch('/api/dashboard/open-rates').then(r=>r.json()).then(d=>{
+  if(d.error){alert(d.error);return;}
+  document.getElementById('sent').textContent=d.sent_count;
+  document.getElementById('opened').textContent=d.opened_count;
+  document.getElementById('rate').textContent=d.open_rate+'%';
+  var rows=document.getElementById('rows');
+  d.items.forEach(it=>{
+    var tr=document.createElement('tr');
+    var last=it.last_opened_at?new Date(it.last_opened_at*1000).toLocaleString():'—';
+    tr.innerHTML='<td>'+it.recipient_email+'</td><td>'+it.subject+'</td><td><span class="badge">'+it.opens+'</span></td><td>'+last+'</td>';
+    rows.appendChild(tr);
+  });
+});
+</script>
+</body>
+</html>
