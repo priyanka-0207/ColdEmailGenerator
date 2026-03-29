@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Generate - ColdMail AI</title>
+<title>Generate - ColdMail</title>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
@@ -97,7 +97,7 @@ body{min-height:100vh;background:#12101f;background-image:radial-gradient(ellips
 </head>
 <body>
 <div class="ct">
-<div class="hd"><a href="/" class="logo"><i>✉️</i><b>ColdMail AI</b></a></div>
+<div class="hd"><a href="/" class="logo"><i>✉️</i><b>ColdMail</b></a></div>
 
 <div class="cd" id="formCard">
 <div class="ct2"><i class="fas fa-wand-magic-sparkles"></i> Generate Cold Email</div>
@@ -105,11 +105,11 @@ body{min-height:100vh;background:#12101f;background-image:radial-gradient(ellips
 
 <div class="mt">
 <button class="mb on" id="bFree" onclick="setMode('free')"><i class="fas fa-zap"></i> Free Template</button>
-<button class="mb off" id="bAI" onclick="setMode('ai')"><i class="fas fa-robot"></i> AI + RAG</button>
+<button class="mb off" id="bAI" onclick="setMode('ai')"><i class="fas fa-robot"></i> Smart Draft</button>
 </div>
 
 <div class="ac" id="aiCfg">
-<div style="font-size:.85rem;font-weight:700;color:#c9a4f5;margin-bottom:3px"><i class="fas fa-key"></i> AI Configuration</div>
+<div style="font-size:.85rem;font-weight:700;color:#c9a4f5;margin-bottom:3px"><i class="fas fa-key"></i> Draft Configuration</div>
 <div style="font-size:.76rem;color:#7a7190;margin-bottom:14px;line-height:1.5">Your key is never stored. Used once and discarded.</div>
 <label class="fl">Provider</label>
 <select class="fs2" id="llmP" onchange="updKey()">
@@ -220,7 +220,7 @@ body{min-height:100vh;background:#12101f;background-image:radial-gradient(ellips
 <button class="bn" onclick="again()"><i class="fas fa-rotate"></i> Generate Another</button>
 </div>
 
-<div class="ft2">Built with RAG + Multi-LLM by <a href="https://www.linkedin.com/in/priyanka-bhutada/">Priyanka Bhutada</a></div>
+<div class="ft2">Built by <a href="https://www.linkedin.com/in/priyanka-bhutada/">Priyanka Bhutada</a></div>
 </div>
 
 <script>
@@ -230,7 +230,7 @@ var KG={groq:'https://console.groq.com/keys',openai:'https://platform.openai.com
 var KP={groq:'gsk_...',openai:'sk-...',anthropic:'sk-ant-...',gemini:'AIza...'};
 var LC={groq:{url:'https://api.groq.com/openai/v1/chat/completions',model:'llama-3.3-70b-versatile'},openai:{url:'https://api.openai.com/v1/chat/completions',model:'gpt-4o-mini'},anthropic:{url:'https://api.anthropic.com/v1/messages',model:'claude-sonnet-4-20250514'},gemini:{url:'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',model:'gemini-2.0-flash'}};
 
-function setMode(m){mode=m;document.getElementById('bFree').className='mb '+(m==='free'?'on':'off');document.getElementById('bAI').className='mb '+(m==='ai'?'on':'off');document.getElementById('aiCfg').className=m==='ai'?'ac show':'ac';document.getElementById('gT').textContent=m==='ai'?'Generate with AI + RAG':'Generate Email';uR();}
+function setMode(m){mode=m;document.getElementById('bFree').className='mb '+(m==='free'?'on':'off');document.getElementById('bAI').className='mb '+(m==='ai'?'on':'off');document.getElementById('aiCfg').className=m==='ai'?'ac show':'ac';document.getElementById('gT').textContent=m==='ai'?'Generate with Smart Draft':'Generate Email';uR();}
 function updKey(){var p=document.getElementById('llmP').value;document.getElementById('apiK').placeholder=KP[p];document.getElementById('kL').href=KG[p];}
 function pT(el,v){document.querySelectorAll('.tc').forEach(function(c){c.classList.remove('on')});el.classList.add('on');tone=v;}
 function sErr(m){var e=document.getElementById('err');e.textContent=m;e.classList.add('show');setTimeout(function(){e.classList.remove('show')},5000);}
@@ -289,9 +289,9 @@ function gen(){
     btn.disabled=true;btn.innerHTML='<span class="sp"></span> '+(jd?'Analyzing with RAG...':'Generating...');
     callAI(prov,key,{name:name,toN:toN,co:co,role:role,res:res,jd:jd,tone:tone}).then(function(r){
       show(to,r.subject,r.body,r.variations||[],r.followup_subject||'',r.followup_body||'',r.linkedin||'',r.score||0,r.tips||[],!!jd,jd,res);
-      btn.disabled=false;btn.innerHTML='<i class="fas fa-sparkles"></i> <span>Generate with AI + RAG</span>';
+      btn.disabled=false;btn.innerHTML='<i class="fas fa-sparkles"></i> <span>Generate with Smart Draft</span>';
     }).catch(function(e){
-      sErr('AI Error: '+e.message);btn.disabled=false;btn.innerHTML='<i class="fas fa-sparkles"></i> <span>Generate with AI + RAG</span>';
+      sErr('Draft Error: '+e.message);btn.disabled=false;btn.innerHTML='<i class="fas fa-sparkles"></i> <span>Generate with Smart Draft</span>';
     });
     return;
   }
@@ -351,7 +351,7 @@ function callAI(prov,key,d){
 
 function show(to,sub,body,vars,fuS,fuB,li,score,tips,rag,jd,res){
   var b=document.getElementById('oB');
-  if(rag){b.className='bd bd-r';b.innerHTML='<i class="fas fa-brain"></i> AI + RAG'}
+  if(rag){b.className='bd bd-r';b.innerHTML='<i class="fas fa-brain"></i> Smart Draft'}
   else if(mode==='ai'){b.className='bd bd-a';b.innerHTML='<i class="fas fa-robot"></i> AI'}
   else{b.className='bd bd-t';b.innerHTML='<i class="fas fa-zap"></i> Template'}
 
