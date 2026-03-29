@@ -1,6 +1,28 @@
-.venv/
-.env
+# Python bytecode
 __pycache__/
-*.pyc
-scheduler.db
+*.py[cod]
+*$py.class
+
+# Local databases
+*.db
+*.sqlite3
+
+# Environments
+.venv/
+env/
+venv/
+ENV/
+
+# Secrets & local config
+.env
+instance/
+.python-version
+
+# Tooling caches
 .pytest_cache/
+
+# IDEs and OS-specific files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
