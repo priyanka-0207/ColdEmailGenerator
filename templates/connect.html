@@ -123,36 +123,10 @@ fetch('/api/status').then(function(r){return r.json()}).then(function(d){
 }).catch(function(){});
 
 function connect(){
-  var email=document.getElementById('email').value.trim();
-  var pass=document.getElementById('pass').value.trim();
-  if(!email||!pass){notify('Please enter your email and app password','err');return}
-
   var btn=document.getElementById('conBtn');
   btn.disabled=true;
-  btn.innerHTML='<span class="sp"></span> Verifying...';
-
-  fetch('/api/connect',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({provider:provider,email:email,password:pass})
-  }).then(function(r){return r.json().then(function(d){return{ok:r.ok,data:d}})})
-  .then(function(res){
-    btn.disabled=false;
-    btn.innerHTML='<i class="fas fa-link"></i> Connect & Verify';
-    if(res.ok&&res.data.success){
-      notify('Connected! Redirecting to generate...','ok');
-      document.getElementById('conStatus').classList.add('show');
-      document.getElementById('conText').textContent='Connected: '+provider.charAt(0).toUpperCase()+provider.slice(1)+' ('+email+')';
-      setTimeout(function(){window.location.href='/generate'},1500);
-    }else{
-      notify(res.data.error||'Connection failed','err');
-    }
-  }).catch(function(e){
-    btn.disabled=false;
-    btn.innerHTML='<i class="fas fa-link"></i> Connect & Verify';
-    notify('Network error: '+e.message,'err');
-  
-  });
+  btn.innerHTML='<span class="sp"></span> Redirecting...';
+  window.location.href='/api/oauth/start?provider='+encodeURIComponent(provider);
 }
 </script>
 </body>
